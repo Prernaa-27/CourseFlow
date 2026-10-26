@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}Attendance Management{% endblock %}
+{% block breadcrumb %}Attendance{% endblock %}
+
+{% block content %}
+<div id="attendanceRoot">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div>
+      <h2 class="page-title">Attendance Management</h2>
+      <p class="page-subtitle">Record lecture attendance (Present / Absent) and view student attendance percentages.</p>
+    </div>
+    <div class="d-flex align-items-center gap-2 mt-3 mt-md-0">
+      <button class="btn btn-outline-secondary btn-sm" id="markAllPresentBtn">
+        <i class="bi bi-check-all me-1 text-success"></i> Mark All Present
+      </button>
+      <button class="btn btn-outline-secondary btn-sm" id="markAllAbsentBtn">
+        <i class="bi bi-x-lg me-1 text-danger"></i> Mark All Absent
+      </button>
+      <button class="btn btn-primary btn-sm d-flex align-items-center gap-2 shadow-xs" id="saveAttendanceBtn">
+        <i class="bi bi-save2"></i> Save Attendance
+      </button>
+    </div>
+  </div>
+
+  <!-- Selector Bar -->
+  <div class="cf-card p-3 mb-4">
+    <div class="row g-2 align-items-center">
+      <div class="col-md-4">
+        <label for="attendanceCourseSelect" class="small text-muted fw-semibold mb-1">Course:</label>
+        <select id="attendanceCourseSelect" class="form-select form-select-sm">
+          <option value="CS301" selected>CS301 - Software Engineering</option>
+          <option value="CS302">CS302 - Database Management Systems</option>
+          <option value="CS303">CS303 - Design & Analysis of Algorithms</option>
+          <option value="CS401">CS401 - Cloud Computing & DevOps</option>
+        </select>
+      </div>
+
+      <div class="col-md-4">
+        <label for="attendanceDateSelect" class="small text-muted fw-semibold mb-1">Lecture Session Date:</label>
+        <select id="attendanceDateSelect" class="form-select form-select-sm" onchange="renderAttendanceInterface()">
+          <option value="0">Session #1 - 2024-08-05</option>
+          <option value="1">Session #2 - 2024-08-07</option>
+          <option value="2">Session #3 - 2024-08-12</option>
+          <option value="3">Session #4 - 2024-08-14</option>
+          <option value="4">Session #5 - 2024-08-19</option>
+          <option value="5">Session #6 - 2024-08-21</option>
+          <option value="6" selected>Session #7 - 2024-08-26 (Latest)</option>
+        </select>
+      </div>
+
+      <div class="col-md-4 text-md-end pt-md-3">
+        <span class="badge bg-danger-subtle text-danger border border-danger-subtle p-2" id="lowAttendanceAlertBadge">
+          Calculating attendance...
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Attendance Table -->
+  <div class="cf-card mb-4">
+    <div class="cf-card-header">
+      <h6 class="cf-card-title">
+        <i class="bi bi-person-check text-primary"></i> Attendance Sheet
+      </h6>
+      <span class="small text-muted"><strong>P</strong> = Present &bull; <strong>A</strong> = Absent</span>
+    </div>
+    <div class="cf-table-wrapper">
+      <table class="cf-table">
+        <thead>
+          <tr>
+            <th style="width: 140px;">Student ID</th>
+            <th>Full Name</th>
+            <th class="text-center" style="width: 180px;">Session Attendance</th>
+            <th class="text-center" style="width: 160px;">Cumulative %</th>
+          </tr>
+        </thead>
+        <tbody id="attendanceTableTbody">
+          <!-- Dynamically populated by records.js -->
+        </tbody>
+      </table>
+    </div>
+    <div class="cf-card-footer d-flex justify-content-between align-items-center">
+      <span class="small text-muted"><i class="bi bi-info-circle text-primary me-1"></i>Students below 75% attendance are flagged for review.</span>
+      <button class="btn btn-sm btn-primary" onclick="document.getElementById('saveAttendanceBtn').click()">Save Attendance</button>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/records.js') }}"></script>
+{% endblock %}

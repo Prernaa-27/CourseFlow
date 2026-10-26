@@ -1,0 +1,216 @@
+{% extends "base.html" %}
+
+{% block title %}Course File Dossier Preview{% endblock %}
+{% block breadcrumb %}<a href="/course-file">Course File</a> / Preview Dossier{% endblock %}
+
+{% block content %}
+<div id="courseFilePreviewRoot">
+  <!-- Top Action Bar (Hidden in Print) -->
+  <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 mb-4 no-print">
+    <div>
+      <a href="/course-file" class="text-secondary small text-decoration-none hover-primary">
+        <i class="bi bi-arrow-left me-1"></i> Back to Checklist
+      </a>
+      <h3 class="fw-bold text-dark mt-1 mb-0">Course Dossier Preview</h3>
+      <div class="text-muted small">Comprehensive 8-Section Academic Course File Summary</div>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+      <button class="btn btn-outline-secondary btn-sm" id="downloadPdfBtn">
+        <i class="bi bi-file-earmark-pdf me-1 text-danger"></i> Save as PDF
+      </button>
+      <button class="btn btn-primary btn-sm d-flex align-items-center gap-2 shadow-xs" id="printPdfBtn">
+        <i class="bi bi-printer me-1"></i> Print Official Dossier
+      </button>
+    </div>
+  </div>
+
+  <!-- Document Paper Sheet Container -->
+  <div class="cf-card p-5 mb-5 bg-white shadow-sm border" style="max-width: 900px; margin: 0 auto; min-height: 1100px;">
+    
+    <!-- 1. OFFICIAL COVER PAGE -->
+    <div class="text-center py-5 border-bottom mb-5">
+      <div class="brand-icon mx-auto mb-3" style="width: 56px; height: 56px; font-size: 1.75rem;">
+        <i class="bi bi-mortarboard-fill"></i>
+      </div>
+      <h3 class="fw-bold text-dark text-uppercase tracking-wide mb-1" style="letter-spacing: 0.05em;">Apex University of Technology</h3>
+      <h6 class="text-secondary text-uppercase mb-4" style="letter-spacing: 0.1em; font-size: 0.85rem;">Department of Computer Science & Engineering</h6>
+      
+      <div class="badge bg-primary px-3 py-2 text-uppercase mb-4" style="letter-spacing: 0.08em; font-size: 0.8rem;">
+        Official Course File Dossier &bull; Academic Portfolio
+      </div>
+
+      <div class="my-4 py-3 bg-light rounded-3 border">
+        <h1 class="display-6 fw-bold text-dark mb-1 preview-course-code">CS301</h1>
+        <h4 class="text-primary fw-semibold mb-0 preview-course-title">Software Engineering</h4>
+      </div>
+
+      <div class="row justify-content-center g-4 my-4 text-start">
+        <div class="col-sm-5">
+          <div class="text-muted small">Academic Year:</div>
+          <strong class="text-dark preview-course-year">2024-2025</strong>
+        </div>
+        <div class="col-sm-5">
+          <div class="text-muted small">Semester:</div>
+          <strong class="text-dark preview-course-sem">Semester 5</strong>
+        </div>
+        <div class="col-sm-5">
+          <div class="text-muted small">Course Instructor:</div>
+          <strong class="text-dark preview-course-faculty">Dr. Sarah Jenkins</strong>
+        </div>
+        <div class="col-sm-5">
+          <div class="text-muted small">Department:</div>
+          <strong class="text-dark preview-course-dept">Computer Science & Engineering</strong>
+        </div>
+      </div>
+
+      <!-- Signatures Block -->
+      <div class="row g-4 mt-5 pt-5 text-center">
+        <div class="col-6">
+          <div class="border-top pt-2 small text-muted">Course Coordinator Signature</div>
+        </div>
+        <div class="col-6">
+          <div class="border-top pt-2 small text-muted">Head of Department (HOD)</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1. COURSE DESCRIPTION & OBJECTIVES -->
+    <div class="mb-5 page-break">
+      <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">1. Course Information & Objectives</h5>
+      <p class="text-secondary small preview-course-desc" style="line-height: 1.7;">
+        Comprehensive study of software lifecycle models, requirements engineering, architectural design, agile methodologies, testing techniques, and project management.
+      </p>
+    </div>
+
+    <!-- 2. APPROVED SYLLABUS -->
+    <div class="mb-5">
+      <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">2. Approved Course Syllabus Units</h5>
+      <table class="table table-bordered table-sm small">
+        <thead class="table-light">
+          <tr>
+            <th style="width: 80px;">Unit</th>
+            <th>Title & Topics Covered</th>
+            <th class="text-center" style="width: 100px;">Contact Hrs</th>
+            <th class="text-center" style="width: 100px;">Outcome</th>
+          </tr>
+        </thead>
+        <tbody id="previewSyllabusTbody">
+          <!-- Dynamically populated -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 3. SESSION DELIVERY LOG -->
+    <div class="mb-5 page-break">
+      <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">3. Session Plan & Teaching Delivery Log</h5>
+      <table class="table table-bordered table-sm small">
+        <thead class="table-light">
+          <tr>
+            <th class="text-center" style="width: 50px;">#</th>
+            <th>Lecture Topic</th>
+            <th class="text-center" style="width: 60px;">CO</th>
+            <th style="width: 110px;">Date</th>
+            <th>Teaching Method</th>
+            <th class="text-center" style="width: 90px;">Status</th>
+          </tr>
+        </thead>
+        <tbody id="previewSessionsTbody">
+          <!-- Dynamically populated -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 4. STUDENT ENROLLMENT & ATTENDANCE -->
+    <div class="mb-5">
+      <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">4. Student Records & Attendance Summary</h5>
+      <table class="table table-bordered table-sm small">
+        <thead class="table-light">
+          <tr>
+            <th style="width: 100px;">Roll No</th>
+            <th>Student Name</th>
+            <th class="text-center" style="width: 120px;">Attendance Status</th>
+            <th class="text-center" style="width: 120px;">Attendance %</th>
+          </tr>
+        </thead>
+        <tbody id="previewStudentsTbody">
+          <!-- Dynamically populated -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 5. ASSESSMENT SCHEME -->
+    <div class="mb-5 page-break">
+      <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">5. Academic Assessment Scheme & Marks</h5>
+      <table class="table table-bordered table-sm small">
+        <thead class="table-light">
+          <tr>
+            <th>Assessment Component</th>
+            <th>Type</th>
+            <th class="text-center">Max Marks</th>
+            <th class="text-center">Weightage</th>
+            <th class="text-center">Mapped CO</th>
+          </tr>
+        </thead>
+        <tbody id="previewAssessmentsTbody">
+          <!-- Dynamically populated -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 6. STUDENT FEEDBACK SUMMARY -->
+    <div class="mb-5">
+      <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">6. Student Feedback Summary</h5>
+      <div id="previewFeedbackContainer" class="p-3 bg-light rounded border small">
+        <!-- Dynamically populated -->
+      </div>
+    </div>
+
+    <!-- 7. CO-PO OUTCOME MAPPING -->
+    <div class="mb-5 page-break">
+      <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">7. Course Outcome (CO) to PO/PSO Mapping</h5>
+      <table class="table table-bordered table-sm small text-center">
+        <thead class="table-light">
+          <tr>
+            <th class="text-start">Course Outcome</th>
+            <th>PO1</th>
+            <th>PO2</th>
+            <th>PO3</th>
+            <th>PO4</th>
+            <th>PO5</th>
+            <th>PSO1</th>
+            <th>PSO2</th>
+          </tr>
+        </thead>
+        <tbody id="previewOutcomesTbody">
+          <!-- Dynamically populated -->
+        </tbody>
+      </table>
+      <div class="small text-muted mt-1">Scale: 1 = Low (Slight), 2 = Moderate (Medium), 3 = High (Substantial), - = No Correlation.</div>
+    </div>
+
+    <!-- 8. OUTCOME ATTAINMENT SUMMARY -->
+    <div class="mb-5">
+      <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">8. Course Outcome (CO) Attainment Summary</h5>
+      <table class="table table-bordered table-sm small">
+        <thead class="table-light">
+          <tr>
+            <th>Outcome Code</th>
+            <th class="text-center">Target %</th>
+            <th class="text-center">Average Student %</th>
+            <th class="text-center">Difference</th>
+            <th class="text-center">Status</th>
+          </tr>
+        </thead>
+        <tbody id="previewAttainmentTbody">
+          <!-- Dynamically populated -->
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/course_file.js') }}"></script>
+{% endblock %}

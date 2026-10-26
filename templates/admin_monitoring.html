@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+
+{% block title %}Completion Monitoring{% endblock %}
+{% block breadcrumb %}Administration / Completion Monitoring{% endblock %}
+
+{% block content %}
+<div id="adminMonitoringRoot">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div>
+      <h2 class="page-title">Department-Level Course File Compliance</h2>
+      <p class="page-subtitle">Real-time audit dashboard tracking course dossier completion across Computer Science & Engineering faculty.</p>
+    </div>
+    <div class="d-flex align-items-center gap-2 mt-3 mt-md-0">
+      <button class="btn btn-outline-primary btn-sm" id="exportMonitoringReportBtn">
+        <i class="bi bi-file-earmark-spreadsheet me-1"></i> Export Compliance Audit (CSV)
+      </button>
+    </div>
+  </div>
+
+  <!-- Department KPI Stats -->
+  <div class="row g-3 mb-4">
+    <div class="col-sm-6 col-xl-3">
+      <div class="cf-card stat-card mb-0">
+        <div>
+          <div class="stat-label">Department Avg Readiness</div>
+          <div class="stat-value text-primary" id="monAvgCompletion">-</div>
+          <div class="stat-desc text-muted"><i class="bi bi-speedometer2"></i> Overall accreditation index</div>
+        </div>
+        <div class="stat-icon stat-icon-indigo">
+          <i class="bi bi-pie-chart-fill"></i>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-sm-6 col-xl-3">
+      <div class="cf-card stat-card mb-0">
+        <div>
+          <div class="stat-label">Audit-Ready (100%)</div>
+          <div class="stat-value text-success" id="monCompletedCount">-</div>
+          <div class="stat-desc text-success"><i class="bi bi-check-circle-fill"></i> Fully certified dossiers</div>
+        </div>
+        <div class="stat-icon stat-icon-green">
+          <i class="bi bi-check2-all"></i>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-sm-6 col-xl-3">
+      <div class="cf-card stat-card mb-0">
+        <div>
+          <div class="stat-label">In Progress (50-99%)</div>
+          <div class="stat-value text-info" id="monInProgressCount">-</div>
+          <div class="stat-desc text-muted"><i class="bi bi-hourglass-split"></i> Awaiting CIE-2 / SEE input</div>
+        </div>
+        <div class="stat-icon stat-icon-amber">
+          <i class="bi bi-hourglass-bottom"></i>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-sm-6 col-xl-3">
+      <div class="cf-card stat-card mb-0">
+        <div>
+          <div class="stat-label">Needs Attention (&lt;50%)</div>
+          <div class="stat-value text-danger" id="monLaggingCount">-</div>
+          <div class="stat-desc text-danger"><i class="bi bi-exclamation-triangle-fill"></i> Dean notification sent</div>
+        </div>
+        <div class="stat-icon stat-icon-rose">
+          <i class="bi bi-shield-exclamation"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chart and Summary Row -->
+  <div class="row g-4 mb-4">
+    <div class="col-lg-5">
+      <div class="cf-card mb-0 h-100">
+        <div class="cf-card-header">
+          <h6 class="cf-card-title">
+            <i class="bi bi-pie-chart text-primary"></i> Dossier Status Breakdown
+          </h6>
+          <span class="badge bg-light text-muted border small">All Offerings</span>
+        </div>
+        <div class="cf-card-body">
+          <div style="height: 240px; position: relative;">
+            <canvas id="departmentProgressChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-7">
+      <div class="cf-card mb-0 h-100">
+        <div class="cf-card-header">
+          <h6 class="cf-card-title">
+            <i class="bi bi-patch-check text-primary"></i> Accreditation Audit Standards
+          </h6>
+        </div>
+        <div class="cf-card-body">
+          <h6 class="fw-bold text-dark small mb-2">NBA Tier-1 Criteria 2 & 3 Compliance Thresholds:</h6>
+          <ul class="text-secondary small mb-4">
+            <li class="mb-1"><strong>Syllabus & Session Plans:</strong> Must be finalized within the first 14 calendar days of semester commencement.</li>
+            <li class="mb-1"><strong>Continuous Internal Evaluation (CIE):</strong> Marks entry and outcome mapping must be committed within 7 days of exam conclusion.</li>
+            <li class="mb-1"><strong>Bi-Weekly Attendance:</strong> Mandatory minimum threshold of 75% required for student SEE eligibility.</li>
+            <li><strong>Outcome Attainment Closure:</strong> Action Taken Report (ATR) mandated for any outcome attaining less than 75% target benchmark.</li>
+          </ul>
+
+          <div class="p-3 bg-light rounded border d-flex align-items-center justify-content-between">
+            <div>
+              <div class="fw-semibold text-dark small">Next Department Review Committee Meeting:</div>
+              <div class="text-muted small">Friday, 3:00 PM &bull; Academic Council Room 204</div>
+            </div>
+            <span class="badge bg-primary px-3 py-2">Scheduled</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Monitoring Ledger Table -->
+  <div class="cf-card mb-4">
+    <div class="cf-card-header">
+      <h6 class="cf-card-title">
+        <i class="bi bi-table text-primary"></i> Department Course File Compliance Ledger
+      </h6>
+      <span class="small text-muted">Real-time status synced with faculty portfolio updates</span>
+    </div>
+    <div class="cf-table-wrapper">
+      <table class="cf-table">
+        <thead>
+          <tr>
+            <th>Course Code</th>
+            <th>Course Title</th>
+            <th>Assigned Faculty</th>
+            <th>Semester</th>
+            <th>Dossier Readiness</th>
+            <th>Status</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="monitoringTableTbody">
+          <!-- Dynamically populated by admin.js -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+{% endblock %}

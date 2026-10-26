@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}Marks Entry{% endblock %}
+{% block breadcrumb %}Marks Entry{% endblock %}
+
+{% block content %}
+<div id="marksRoot">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div>
+      <h2 class="page-title">Marks Entry & Evaluation Register</h2>
+      <p class="page-subtitle">Input student performance scores, validate maximum marks, and monitor missing evaluations.</p>
+    </div>
+    <div class="d-flex align-items-center gap-2 mt-3 mt-md-0">
+      <button class="btn btn-primary btn-sm d-flex align-items-center gap-2 shadow-xs" id="saveMarksBtn">
+        <i class="bi bi-save2"></i> Save Marks
+      </button>
+    </div>
+  </div>
+
+  <!-- Assessment Selector Bar -->
+  <div class="cf-card p-3 mb-4">
+    <div class="row g-2 align-items-center">
+      <div class="col-md-5">
+        <label for="marksAssessmentSelect" class="small text-muted fw-semibold mb-1">Select Assessment:</label>
+        <select id="marksAssessmentSelect" class="form-select form-select-sm">
+          <option value="ASM01" selected>Continuous Internal Evaluation (CIE-1) - Max 50</option>
+          <option value="ASM02">Lab Assignment 1 - UML & Architecture - Max 25</option>
+          <option value="ASM03">Continuous Internal Evaluation (CIE-2) - Max 50</option>
+          <option value="ASM04">Term Course Project & Defense - Max 50</option>
+        </select>
+      </div>
+
+      <div class="col-md-7 d-flex justify-content-md-end align-items-center gap-3 pt-md-3">
+        <span class="badge bg-primary-subtle text-primary p-2" id="marksMaxBadge">Max Marks: 50</span>
+        <span class="badge bg-light text-dark border p-2">Graded: <strong id="marksSummaryEntered" class="text-primary">-</strong></span>
+        <span class="badge bg-light text-dark border p-2">Batch Average: <strong id="marksSummaryAverage" class="text-primary">-</strong></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Marks Entry Table -->
+  <div class="cf-card mb-4">
+    <div class="cf-card-header">
+      <h6 class="cf-card-title">
+        <i class="bi bi-input-cursor-text text-primary"></i> Student Marks Roster
+      </h6>
+      <span class="small text-muted">Values are validated strictly against assessment maximum score.</span>
+    </div>
+    <div class="cf-table-wrapper">
+      <table class="cf-table">
+        <thead>
+          <tr>
+            <th style="width: 140px;">Student ID</th>
+            <th>Student Name</th>
+            <th class="text-center" style="width: 100px;">Section</th>
+            <th class="text-center" style="width: 160px;">Marks Obtained</th>
+            <th class="text-center" style="width: 120px;">Percentage</th>
+          </tr>
+        </thead>
+        <tbody id="marksTableTbody">
+          <!-- Dynamically populated by records.js -->
+        </tbody>
+      </table>
+    </div>
+    <div class="cf-card-footer d-flex justify-content-between align-items-center">
+      <span class="small text-muted"><i class="bi bi-info-circle me-1"></i>Press "Save Marks" to commit grades into the OBE attainment database.</span>
+      <button class="btn btn-sm btn-primary" onclick="document.getElementById('saveMarksBtn').click()">Save All Changes</button>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/records.js') }}"></script>
+{% endblock %}

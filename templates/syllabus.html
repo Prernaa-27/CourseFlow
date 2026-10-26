@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+
+{% block title %}Syllabus Management{% endblock %}
+{% block breadcrumb %}Syllabus{% endblock %}
+
+{% block content %}
+<div id="syllabusRoot">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div>
+      <h2 class="page-title">Syllabus Management</h2>
+      <p class="page-subtitle">Configure course modules, topics, contact hours, and learning outcome alignment.</p>
+    </div>
+    <div class="d-flex align-items-center gap-2 mt-3 mt-md-0">
+      <button class="btn btn-outline-secondary btn-sm" id="markReviewedBtn">
+        <i class="bi bi-patch-check me-1"></i> Mark as Reviewed
+      </button>
+      <button class="btn btn-primary btn-sm d-flex align-items-center gap-2 shadow-xs" id="addUnitBtn">
+        <i class="bi bi-plus-lg"></i> Add Unit / Module
+      </button>
+    </div>
+  </div>
+
+  <!-- Course Selector & Overview Row -->
+  <div class="row g-3 mb-4">
+    <div class="col-md-8">
+      <div class="cf-card p-3 mb-0">
+        <div class="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3">
+          <div class="d-flex align-items-center gap-3">
+            <label for="syllabusCourseSelect" class="small fw-semibold text-muted mb-0">Course:</label>
+            <select id="syllabusCourseSelect" class="form-select form-select-sm" style="min-width: 200px;">
+              <option value="CS301" selected>CS301 - Software Engineering</option>
+              <option value="CS302">CS302 - Database Management Systems</option>
+              <option value="CS303">CS303 - Design & Analysis of Algorithms</option>
+              <option value="CS401">CS401 - Cloud Computing & DevOps</option>
+              <option value="CS202">CS202 - Object-Oriented Programming (Java)</option>
+            </select>
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <span class="badge bg-success-subtle text-success border border-success-subtle">
+              <i class="bi bi-check-circle-fill me-1"></i> Syllabus Verified
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="cf-card p-3 mb-0 d-flex align-items-center justify-content-between">
+        <div>
+          <div class="text-muted small">Total Teaching Hours:</div>
+          <h4 class="fw-bold text-primary mb-0" id="totalTeachingHours">45 Hours</h4>
+        </div>
+        <div class="stat-icon stat-icon-indigo">
+          <i class="bi bi-clock-history"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Document Upload Box (With transparent integration guidance) -->
+  <div class="cf-card p-3 mb-4 bg-light border-dashed">
+    <div class="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3">
+      <div class="d-flex align-items-center gap-3">
+        <i class="bi bi-file-earmark-arrow-up text-primary fs-3"></i>
+        <div>
+          <div class="fw-semibold text-dark small">Import Syllabus Document</div>
+          <div class="text-secondary small" style="font-size: 0.78rem;">Upload approved university syllabus (.docx or .pdf) to parse modules.</div>
+        </div>
+      </div>
+      <div>
+        <label for="syllabusFileInput" class="btn btn-sm btn-outline-primary mb-0 cursor-pointer">
+          <i class="bi bi-upload me-1"></i> Upload Handout
+        </label>
+        <input type="file" id="syllabusFileInput" class="d-none" accept=".pdf,.docx,.txt">
+      </div>
+    </div>
+  </div>
+
+  <!-- Units List Container -->
+  <div id="syllabusUnitsContainer">
+    <!-- Populated by records.js -->
+  </div>
+</div>
+
+<!-- Add / Edit Unit Modal -->
+<div class="modal fade" id="unitModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content" style="border-radius: var(--radius-lg);">
+      <div class="modal-header border-bottom">
+        <h5 class="modal-title fw-bold text-dark">Configure Syllabus Unit</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form id="unitModalForm" novalidate onsubmit="event.preventDefault(); saveUnitFromModal();">
+        <div class="modal-body p-4">
+          <div class="row g-3">
+            <div class="col-md-3">
+              <label for="unitModalNumber" class="form-label small fw-semibold text-dark">Unit Number <span class="text-danger">*</span></label>
+              <input type="number" class="form-control form-control-sm" id="unitModalNumber" min="1" max="10" required>
+            </div>
+            <div class="col-md-9">
+              <label for="unitModalTitle" class="form-label small fw-semibold text-dark">Unit Title <span class="text-danger">*</span></label>
+              <input type="text" class="form-control form-control-sm" id="unitModalTitle" placeholder="e.g. Architectural Design & Patterns" required>
+              <div class="invalid-feedback">Title is required.</div>
+            </div>
+            <div class="col-md-6">
+              <label for="unitModalHours" class="form-label small fw-semibold text-dark">Contact Hours <span class="text-danger">*</span></label>
+              <input type="number" class="form-control form-control-sm" id="unitModalHours" min="1" max="50" required>
+            </div>
+            <div class="col-md-6">
+              <label for="unitModalOutcomes" class="form-label small fw-semibold text-dark">Mapped Outcomes (COs) <span class="text-danger">*</span></label>
+              <input type="text" class="form-control form-control-sm" id="unitModalOutcomes" placeholder="e.g. CO2, CO3" required>
+            </div>
+            <div class="col-12">
+              <label for="unitModalTopics" class="form-label small fw-semibold text-dark">Topic Breakdown & Readings <span class="text-danger">*</span></label>
+              <textarea class="form-control form-control-sm" id="unitModalTopics" rows="3" placeholder="List core topics covered..." required></textarea>
+              <div class="invalid-feedback">Topic description is required.</div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer border-top bg-light">
+          <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary btn-sm px-3">Save Unit</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/records.js') }}"></script>
+{% endblock %}

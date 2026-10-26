@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block title %}Faculty Management{% endblock %}
+{% block breadcrumb %}Administration / Faculty Management{% endblock %}
+
+{% block content %}
+<div id="adminFacultyRoot">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div>
+      <h2 class="page-title">Department Faculty Management</h2>
+      <p class="page-subtitle">Oversee faculty members, departmental roles, academic status, and teaching allocations.</p>
+    </div>
+    <div class="d-flex align-items-center gap-2 mt-3 mt-md-0">
+      <button class="btn btn-primary btn-sm d-flex align-items-center gap-2 shadow-xs" onclick="openFacultyModal()">
+        <i class="bi bi-person-plus-fill"></i> Add Faculty Member
+      </button>
+    </div>
+  </div>
+
+  <!-- Search Bar -->
+  <div class="cf-card p-3 mb-4">
+    <div class="row g-2 align-items-center">
+      <div class="col-md-6">
+        <div class="input-group input-group-sm">
+          <span class="input-group-text bg-light text-muted"><i class="bi bi-search"></i></span>
+          <input type="text" id="facultySearchInput" class="form-control" placeholder="Search by faculty name, email, or department...">
+        </div>
+      </div>
+      <div class="col-md-6 text-md-end">
+        <span class="badge bg-light text-dark border p-2 small" id="facultyTotalBadge">Loading faculty...</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Faculty Table -->
+  <div class="cf-card mb-4">
+    <div class="cf-table-wrapper">
+      <table class="cf-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Faculty Name & Email</th>
+            <th>Academic Role</th>
+            <th>Department</th>
+            <th class="text-center">Courses Assigned</th>
+            <th>Status</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="facultyTableTbody">
+          <!-- Dynamically populated by admin.js -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Faculty Modal -->
+<div class="modal fade" id="facultyModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content" style="border-radius: var(--radius-lg);">
+      <div class="modal-header border-bottom">
+        <h5 class="modal-title fw-bold text-dark" id="facultyModalTitle">Add Faculty Member</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form id="facultyModalForm" novalidate>
+        <div class="modal-body p-4">
+          <input type="hidden" id="facultyIdField">
+
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label for="facultyNameField" class="form-label small fw-semibold text-dark">Full Name & Title <span class="text-danger">*</span></label>
+              <input type="text" class="form-control form-control-sm" id="facultyNameField" placeholder="e.g. Dr. Maya Patel" required>
+              <div class="invalid-feedback">Name is required.</div>
+            </div>
+
+            <div class="col-md-6">
+              <label for="facultyEmailField" class="form-label small fw-semibold text-dark">University Email <span class="text-danger">*</span></label>
+              <input type="email" class="form-control form-control-sm" id="facultyEmailField" placeholder="maya.patel@courseflow.demo" required>
+              <div class="invalid-feedback">Valid email is required.</div>
+            </div>
+
+            <div class="col-md-4">
+              <label for="facultyRoleField" class="form-label small fw-semibold text-dark">Academic Role</label>
+              <select class="form-select form-select-sm" id="facultyRoleField">
+                <option value="Professor">Professor</option>
+                <option value="Associate Professor">Associate Professor</option>
+                <option value="Assistant Professor">Assistant Professor</option>
+                <option value="Adjunct Faculty">Adjunct Faculty</option>
+              </select>
+            </div>
+
+            <div class="col-md-4">
+              <label for="facultyDeptField" class="form-label small fw-semibold text-dark">Department</label>
+              <select class="form-select form-select-sm" id="facultyDeptField">
+                <option value="Computer Science & Engineering">Computer Science & Engineering</option>
+                <option value="Information Science & Engineering">Information Science & Engineering</option>
+                <option value="Electronics & Communication">Electronics & Communication</option>
+              </select>
+            </div>
+
+            <div class="col-md-2">
+              <label for="facultyExpField" class="form-label small fw-semibold text-dark">Experience (Yrs)</label>
+              <input type="number" class="form-control form-control-sm" id="facultyExpField" value="8" min="0" max="45">
+            </div>
+
+            <div class="col-md-2">
+              <label for="facultyStatusField" class="form-label small fw-semibold text-dark">Status</label>
+              <select class="form-select form-select-sm" id="facultyStatusField">
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer border-top bg-light">
+          <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary btn-sm px-3">Save Faculty</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+{% endblock %}

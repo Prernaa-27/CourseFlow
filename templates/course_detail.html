@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+
+{% block title %}{{ course.code }} - {{ course.title }}{% endblock %}
+{% block breadcrumb %}<a href="/courses">Courses</a> / {{ course.code }}{% endblock %}
+
+{% block content %}
+<div id="courseDetailRoot">
+  <!-- Top Navigation & Return -->
+  <div class="mb-3">
+    <a href="/courses" class="text-secondary small text-decoration-none hover-primary">
+      <i class="bi bi-arrow-left me-1"></i> Back to Courses Catalog
+    </a>
+  </div>
+
+  <!-- Course Hero Header -->
+  <div class="cf-card p-4 mb-4">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start gap-3">
+      <div>
+        <div class="d-flex align-items-center gap-2 mb-2">
+          <span class="badge bg-primary-subtle text-primary fw-bold px-2 py-1 fs-6">{{ course.code }}</span>
+          <span class="badge bg-light text-dark border">{{ course.semester }}</span>
+          <span class="badge bg-light text-dark border">{{ course.academicYear }}</span>
+          <span class="badge bg-indigo text-primary bg-primary-subtle">{{ course.credits }} Credits</span>
+        </div>
+        <h3 class="fw-bold text-dark mb-1">{{ course.title }}</h3>
+        <p class="text-secondary small mb-2"><i class="bi bi-person-fill text-muted me-1"></i>Instructor: <strong>{{ course.faculty }}</strong> &bull; Department of {{ course.department }}</p>
+      </div>
+
+      <div class="d-flex flex-column align-items-md-end gap-2">
+        <div class="d-flex align-items-center gap-2">
+          <span class="small text-muted">Readiness:</span>
+          <strong class="fs-5 text-dark">{{ course.completion }}%</strong>
+          {{ status_badge | safe }}
+        </div>
+        <div class="d-flex gap-2">
+          <a href="/course-file?course_id={{ course.id }}" class="btn btn-sm btn-primary">
+            <i class="bi bi-folder2-open me-1"></i> Course File Checklist
+          </a>
+          <a href="/course-file/preview?course_id={{ course.id }}" class="btn btn-sm btn-outline-secondary">
+            <i class="bi bi-file-earmark-pdf me-1"></i> Dossier Preview
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Progress bar -->
+    <div class="cf-progress mt-3">
+      <div class="cf-progress-bar {{ 'cf-progress-bar-success' if course.completion == 100 else 'cf-progress-bar-warning' if course.completion < 50 else 'cf-progress-bar-indigo' }}" 
+           style="width: {{ course.completion }}%;"></div>
+    </div>
+  </div>
+
+  <!-- Course Modules Navigation Cards -->
+  <div class="row g-3 mb-4">
+    <div class="col-md-4">
+      <div class="cf-card p-3 h-100">
+        <div class="d-flex align-items-center gap-2 mb-2">
+          <i class="bi bi-journal-text text-primary fs-5"></i>
+          <h6 class="fw-bold text-dark mb-0">Syllabus & Units</h6>
+        </div>
+        <p class="text-secondary small mb-3">5 Approved Units &bull; 45 Total Teaching Hours aligned with Bloom's taxonomy.</p>
+        <a href="/syllabus?course_id={{ course.id }}" class="btn btn-sm btn-outline-primary w-100">Manage Syllabus</a>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="cf-card p-3 h-100">
+        <div class="d-flex align-items-center gap-2 mb-2">
+          <i class="bi bi-calendar3-week text-primary fs-5"></i>
+          <h6 class="fw-bold text-dark mb-0">Session Planning</h6>
+        </div>
+        <p class="text-secondary small mb-3">Lesson calendar, teaching methodologies, and planned vs conducted log.</p>
+        <a href="/session-planner?course_id={{ course.id }}" class="btn btn-sm btn-outline-primary w-100">View Session Plan</a>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="cf-card p-3 h-100">
+        <div class="d-flex align-items-center gap-2 mb-2">
+          <i class="bi bi-people text-primary fs-5"></i>
+          <h6 class="fw-bold text-dark mb-0">Student Enrollment</h6>
+        </div>
+        <p class="text-secondary small mb-3">{{ course.studentsCount }} registered students in Section A & B with attendance records.</p>
+        <a href="/students?course_id={{ course.id }}" class="btn btn-sm btn-outline-primary w-100">Student Roster</a>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="cf-card p-3 h-100">
+        <div class="d-flex align-items-center gap-2 mb-2">
+          <i class="bi bi-card-checklist text-primary fs-5"></i>
+          <h6 class="fw-bold text-dark mb-0">Assessments & Rubrics</h6>
+        </div>
+        <p class="text-secondary small mb-3">CIE-1, CIE-2, Lab Assignments, and Term Project rubrics definition.</p>
+        <a href="/assessments?course_id={{ course.id }}" class="btn btn-sm btn-outline-primary w-100">Assessments Scheme</a>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="cf-card p-3 h-100">
+        <div class="d-flex align-items-center gap-2 mb-2">
+          <i class="bi bi-diagram-3 text-primary fs-5"></i>
+          <h6 class="fw-bold text-dark mb-0">CO-PO/PSO Matrix</h6>
+        </div>
+        <p class="text-secondary small mb-3">Correlation mapping of 5 Course Outcomes to 12 POs and 2 PSOs.</p>
+        <a href="/outcomes?course_id={{ course.id }}" class="btn btn-sm btn-outline-primary w-100">Open Mapping Matrix</a>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="cf-card p-3 h-100">
+        <div class="d-flex align-items-center gap-2 mb-2">
+          <i class="bi bi-graph-up-arrow text-primary fs-5"></i>
+          <h6 class="fw-bold text-dark mb-0">Attainment Analytics</h6>
+        </div>
+        <p class="text-secondary small mb-3">Direct & indirect OBE calculations, benchmark deviations, and action plans.</p>
+        <a href="/attainment?course_id={{ course.id }}" class="btn btn-sm btn-outline-primary w-100">View Attainment</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Catalog Description Card -->
+  <div class="cf-card p-4">
+    <h5 class="fw-bold text-dark mb-2">Course Description & Scope</h5>
+    <p class="text-secondary small mb-4" style="line-height: 1.6;">
+      {{ course.description }}
+    </p>
+
+    <div class="row g-3 pt-3 border-top">
+      <div class="col-sm-4">
+        <div class="text-muted small">Course Delivery Mode:</div>
+        <strong class="text-dark small">Classroom Lecture + Hands-on Laboratory</strong>
+      </div>
+      <div class="col-sm-4">
+        <div class="text-muted small">Pre-requisites:</div>
+        <strong class="text-dark small">Data Structures & Object-Oriented Programming</strong>
+      </div>
+      <div class="col-sm-4">
+        <div class="text-muted small">Target Accreditation:</div>
+        <strong class="text-dark small">NBA Tier-1 Criteria 2 & 3 Compliance</strong>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

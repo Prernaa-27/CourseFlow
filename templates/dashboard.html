@@ -1,0 +1,373 @@
+{% extends "base.html" %}
+
+{% block title %}{{ 'Administrator Dashboard' if user and user.role == 'admin' else 'Faculty Dashboard' }}{% endblock %}
+{% block breadcrumb %}Dashboard{% endblock %}
+
+{% block content %}
+<div id="dashboardRoot">
+  {% if user and user.role == 'admin' %}
+  <!-- ==================================================================== -->
+  <!-- ADMINISTRATOR DASHBOARD VIEW -->
+  <!-- ==================================================================== -->
+  <div class="page-header">
+    <div>
+      <h2 class="page-title">Good morning, {{ user.name.split(' ')[0] if user else 'Administrator' }} <span class="badge bg-secondary-subtle text-dark border border-secondary-subtle fs-6 ms-2">Administrator</span></h2>
+      <p class="page-subtitle">Department of {{ user.department }} &bull; Department Overview & Course Allocations</p>
+    </div>
+    <div class="d-flex align-items-center gap-2 mt-3 mt-md-0">
+      <a href="/admin/assignments" class="btn btn-primary btn-sm d-flex align-items-center gap-2 shadow-xs">
+        <i class="bi bi-arrow-left-right"></i> Course Allocations
+      </a>
+      <a href="/admin/monitoring" class="btn btn-outline-primary btn-sm d-flex align-items-center gap-2">
+        <i class="bi bi-speedometer2"></i> Department Monitoring
+      </a>
+    </div>
+  </div>
+
+  <!-- Admin KPI Cards -->
+  <div class="row g-3 mb-4">
+    <div class="col-sm-6 col-xl-3">
+      <div class="cf-card stat-card mb-0">
+        <div>
+          <div class="stat-label">Department Faculty</div>
+          <div class="stat-value text-primary" id="adminStatFaculty">5</div>
+          <div class="stat-desc text-muted"><i class="bi bi-people-fill text-primary"></i> Active instructors</div>
+        </div>
+        <div class="stat-icon stat-icon-indigo">
+          <i class="bi bi-person-badge"></i>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-sm-6 col-xl-3">
+      <div class="cf-card stat-card mb-0">
+        <div>
+          <div class="stat-label">Department Courses</div>
+          <div class="stat-value text-dark" id="adminStatCourses">5</div>
+          <div class="stat-desc text-muted"><i class="bi bi-journals text-primary"></i> Academic Year 2024-25</div>
+        </div>
+        <div class="stat-icon stat-icon-indigo">
+          <i class="bi bi-book"></i>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-sm-6 col-xl-3">
+      <div class="cf-card stat-card mb-0">
+        <div>
+          <div class="stat-label">Completed Files</div>
+          <div class="stat-value text-success" id="adminStatCompleted">1</div>
+          <div class="stat-desc text-success"><i class="bi bi-check-circle-fill"></i> Ready for audit</div>
+        </div>
+        <div class="stat-icon stat-icon-green">
+          <i class="bi bi-check2-circle"></i>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-sm-6 col-xl-3">
+      <div class="cf-card stat-card mb-0">
+        <div>
+          <div class="stat-label">Files In Progress</div>
+          <div class="stat-value text-warning" id="adminStatInProgress">4</div>
+          <div class="stat-desc text-muted"><i class="bi bi-hourglass-split text-warning"></i> Ongoing completion</div>
+        </div>
+        <div class="stat-icon stat-icon-amber">
+          <i class="bi bi-clock-history"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin Course Overview Table -->
+  <div class="cf-card mb-4">
+    <div class="cf-card-header">
+      <h6 class="cf-card-title">
+        <i class="bi bi-collection text-primary"></i> Department Courses & Teaching Allocations
+      </h6>
+      <a href="/admin/courses" class="btn btn-sm btn-link text-decoration-none small text-primary p-0">All Courses <i class="bi bi-arrow-right"></i></a>
+    </div>
+    <div class="cf-card-body p-0">
+      <div class="cf-table-wrapper">
+        <table class="cf-table">
+          <thead>
+            <tr>
+              <th>Course</th>
+              <th>Semester</th>
+              <th>Assigned Faculty</th>
+              <th>Course File Readiness</th>
+              <th>Status</th>
+              <th class="text-end">Action</th>
+            </tr>
+          </thead>
+          <tbody id="adminCoursesTbody">
+            <!-- Dynamically populated by dashboard.js -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin Quick Actions -->
+  <div class="row g-3">
+    <div class="col-md-4">
+      <div class="cf-card p-3 h-100">
+        <div class="d-flex align-items-center gap-2 mb-2">
+          <i class="bi bi-person-gear text-primary fs-5"></i>
+          <h6 class="fw-bold text-dark mb-0">Faculty Management</h6>
+        </div>
+        <p class="text-secondary small mb-3">View faculty directory, add instructors, and check assigned course load.</p>
+        <a href="/admin/faculty" class="btn btn-sm btn-outline-primary w-100">Manage Faculty</a>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="cf-card p-3 h-100">
+        <div class="d-flex align-items-center gap-2 mb-2">
+          <i class="bi bi-arrow-left-right text-primary fs-5"></i>
+          <h6 class="fw-bold text-dark mb-0">Faculty Assignments</h6>
+        </div>
+        <p class="text-secondary small mb-3">Assign or reassign faculty members to semester course offerings.</p>
+        <a href="/admin/assignments" class="btn btn-sm btn-outline-primary w-100">Edit Assignments</a>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="cf-card p-3 h-100">
+        <div class="d-flex align-items-center gap-2 mb-2">
+          <i class="bi bi-speedometer2 text-primary fs-5"></i>
+          <h6 class="fw-bold text-dark mb-0">Completion Monitoring</h6>
+        </div>
+        <p class="text-secondary small mb-3">Track department-level course-file progress and export compliance summary.</p>
+        <a href="/admin/monitoring" class="btn btn-sm btn-outline-primary w-100">View Monitoring</a>
+      </div>
+    </div>
+  </div>
+
+  {% else %}
+  <!-- ==================================================================== -->
+  <!-- FACULTY DASHBOARD VIEW -->
+  <!-- ==================================================================== -->
+  <div class="page-header">
+    <div>
+      <h2 class="page-title">Good morning, {{ user.name if user else 'Faculty Member' }}</h2>
+      <p class="page-subtitle">Overview of your assigned courses and course-file progress.</p>
+    </div>
+    <div class="d-flex align-items-center gap-2 mt-3 mt-md-0">
+      <a href="/course-file" class="btn btn-primary btn-sm d-flex align-items-center gap-2 shadow-xs">
+        <i class="bi bi-file-earmark-check"></i> Course File Dossier
+      </a>
+      <a href="/ai-assistant" class="btn btn-outline-primary btn-sm d-flex align-items-center gap-2">
+        <i class="bi bi-stars"></i> Handout Summarizer
+      </a>
+    </div>
+  </div>
+
+  <!-- Summary KPI Cards -->
+  <div class="row g-3 mb-4">
+    <div class="col-sm-6 col-xl-3">
+      <div class="cf-card stat-card mb-0">
+        <div>
+          <div class="stat-label">Assigned Courses</div>
+          <div class="stat-value" id="statTotalCourses">-</div>
+          <div class="stat-desc text-muted"><i class="bi bi-calendar-check text-primary"></i> Academic Year 2024-25</div>
+        </div>
+        <div class="stat-icon stat-icon-indigo">
+          <i class="bi bi-book"></i>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-sm-6 col-xl-3">
+      <div class="cf-card stat-card mb-0">
+        <div>
+          <div class="stat-label">Files In Progress</div>
+          <div class="stat-value text-primary" id="statInProgress">-</div>
+          <div class="stat-desc text-muted"><i class="bi bi-hourglass-split text-info"></i> In progress</div>
+        </div>
+        <div class="stat-icon stat-icon-amber">
+          <i class="bi bi-clock-history"></i>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-sm-6 col-xl-3">
+      <div class="cf-card stat-card mb-0">
+        <div>
+          <div class="stat-label">Completed Files</div>
+          <div class="stat-value text-success" id="statCompleted">-</div>
+          <div class="stat-desc text-success"><i class="bi bi-check-circle-fill"></i> Complete & ready</div>
+        </div>
+        <div class="stat-icon stat-icon-green">
+          <i class="bi bi-check2-circle"></i>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-sm-6 col-xl-3">
+      <div class="cf-card stat-card mb-0">
+        <div>
+          <div class="stat-label">Outcomes Below Target</div>
+          <div class="stat-value text-danger" id="statLowAttainment">-</div>
+          <div class="stat-desc text-muted"><i class="bi bi-info-circle text-danger"></i> Needs review</div>
+        </div>
+        <div class="stat-icon stat-icon-rose">
+          <i class="bi bi-graph-down"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts Row -->
+  <div class="row g-4 mb-4">
+    <div class="col-lg-6">
+      <div class="cf-card mb-0 h-100">
+        <div class="cf-card-header">
+          <h6 class="cf-card-title">
+            <i class="bi bi-bar-chart-line text-primary"></i> Course File Readiness Overview
+          </h6>
+          <span class="badge bg-light text-muted border small">All Courses</span>
+        </div>
+        <div class="cf-card-body">
+          <div style="height: 250px; position: relative;">
+            <canvas id="completionChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-6">
+      <div class="cf-card mb-0 h-100">
+        <div class="cf-card-header">
+          <h6 class="cf-card-title">
+            <i class="bi bi-pie-chart text-primary"></i> Outcome Attainment Target vs Achieved (CS301)
+          </h6>
+          <span class="badge bg-primary-subtle text-primary small">Target 70% Benchmark</span>
+        </div>
+        <div class="cf-card-body">
+          <div style="height: 250px; position: relative;">
+            <canvas id="attainmentChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Courses Table & Attention Alerts -->
+  <div class="row g-4 mb-4">
+    <div class="col-lg-8">
+      <div class="cf-card mb-0">
+        <div class="cf-card-header">
+          <h6 class="cf-card-title">
+            <i class="bi bi-collection text-primary"></i> Assigned Courses Status
+          </h6>
+          <a href="/courses" class="btn btn-sm btn-link text-decoration-none small text-primary p-0">View All Courses <i class="bi bi-arrow-right"></i></a>
+        </div>
+        <div class="cf-card-body p-0">
+          <div class="cf-table-wrapper">
+            <table class="cf-table">
+              <thead>
+                <tr>
+                  <th>Course</th>
+                  <th>Semester</th>
+                  <th>Students</th>
+                  <th>Readiness</th>
+                  <th>Status</th>
+                  <th class="text-end">Action</th>
+                </tr>
+              </thead>
+              <tbody id="dashboardCoursesTbody">
+                <!-- Dynamically populated by dashboard.js -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4">
+      <div class="cf-card mb-0">
+        <div class="cf-card-header">
+          <h6 class="cf-card-title">
+            <i class="bi bi-exclamation-circle text-warning"></i> Action Items
+          </h6>
+          <span class="badge bg-warning-subtle text-warning border border-warning-subtle small">Reminders</span>
+        </div>
+        <div class="cf-card-body p-0" id="attentionItemsContainer">
+          <!-- Dynamically populated by dashboard.js -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Upcoming Sessions & Shortcuts -->
+  <div class="row g-4">
+    <div class="col-lg-7">
+      <div class="cf-card mb-0">
+        <div class="cf-card-header">
+          <h6 class="cf-card-title">
+            <i class="bi bi-calendar3-event text-primary"></i> Upcoming Teaching Sessions
+          </h6>
+          <a href="/session-planner" class="btn btn-sm btn-link text-decoration-none small text-primary p-0">Session Planner <i class="bi bi-arrow-right"></i></a>
+        </div>
+        <div class="cf-card-body p-0" id="upcomingSessionsContainer">
+          <!-- Dynamically populated by dashboard.js -->
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-5">
+      <div class="cf-card mb-0">
+        <div class="cf-card-header">
+          <h6 class="cf-card-title">
+            <i class="bi bi-lightning-charge text-primary"></i> Quick Shortcuts
+          </h6>
+        </div>
+        <div class="cf-card-body">
+          <div class="row g-2">
+            <div class="col-6">
+              <a href="/marks?assessment=ASM01" class="btn btn-outline-primary w-100 p-3 text-start h-100 d-flex flex-column justify-content-between">
+                <i class="bi bi-pencil-square fs-4 text-primary mb-2"></i>
+                <div>
+                  <div class="fw-bold small text-dark">Enter Marks</div>
+                  <div class="text-muted" style="font-size:0.72rem;">Record marks</div>
+                </div>
+              </a>
+            </div>
+            <div class="col-6">
+              <a href="/attendance" class="btn btn-outline-primary w-100 p-3 text-start h-100 d-flex flex-column justify-content-between">
+                <i class="bi bi-person-check fs-4 text-primary mb-2"></i>
+                <div>
+                  <div class="fw-bold small text-dark">Attendance</div>
+                  <div class="text-muted" style="font-size:0.72rem;">Mark P/A</div>
+                </div>
+              </a>
+            </div>
+            <div class="col-6">
+              <a href="/outcomes" class="btn btn-outline-primary w-100 p-3 text-start h-100 d-flex flex-column justify-content-between">
+                <i class="bi bi-diagram-3 fs-4 text-primary mb-2"></i>
+                <div>
+                  <div class="fw-bold small text-dark">CO-PO Mapping</div>
+                  <div class="text-muted" style="font-size:0.72rem;">1 to 3 scale</div>
+                </div>
+              </a>
+            </div>
+            <div class="col-6">
+              <a href="/course-file" class="btn btn-outline-primary w-100 p-3 text-start h-100 d-flex flex-column justify-content-between">
+                <i class="bi bi-file-earmark-check fs-4 text-primary mb-2"></i>
+                <div>
+                  <div class="fw-bold small text-dark">Course File</div>
+                  <div class="text-muted" style="font-size:0.72rem;">Checklist & Preview</div>
+                </div>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% endblock %}

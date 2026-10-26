@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}403 Access Forbidden{% endblock %}
+{% block breadcrumb %}Access Forbidden{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center py-5">
+  <div class="col-md-7 col-lg-5 text-center">
+    <div class="empty-state">
+      <div class="empty-state-icon bg-danger-subtle text-danger border-danger-subtle">
+        <i class="bi bi-shield-lock-fill"></i>
+      </div>
+      <h3 class="fw-bold text-dark">403 - Restricted Access</h3>
+      <p class="text-secondary small mb-4">
+        This administration resource requires elevated Administrator privileges. You are currently browsing with the Faculty Member role.
+      </p>
+      <div class="d-flex justify-content-center gap-3">
+        <a href="/dashboard" class="btn btn-outline-primary"><i class="bi bi-house me-1"></i>Return to Dashboard</a>
+        <button class="btn btn-primary" onclick="CourseFlow.apiService.setCurrentUserRole('admin'); fetch('/api/switch-role', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({role:'admin'})}).then(() => window.location.reload());">
+          <i class="bi bi-arrow-repeat me-1"></i>Switch to Administrator Role
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

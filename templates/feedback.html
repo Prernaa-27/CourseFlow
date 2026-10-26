@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block title %}Student Feedback{% endblock %}
+{% block breadcrumb %}Feedback{% endblock %}
+
+{% block content %}
+<div id="feedbackRoot">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div>
+      <h2 class="page-title">Course Feedback Survey</h2>
+      <p class="page-subtitle">Collect student ratings and feedback comments to assess course satisfaction.</p>
+    </div>
+  </div>
+
+  <!-- Course Selector Bar -->
+  <div class="cf-card p-3 mb-4">
+    <div class="row g-2 align-items-center">
+      <div class="col-md-5">
+        <label for="feedbackCourseSelect" class="small text-muted fw-semibold mb-1">Select Course:</label>
+        <select id="feedbackCourseSelect" class="form-select form-select-sm">
+          <option value="CS301" selected>CS301 - Software Engineering</option>
+          <option value="CS302">CS302 - Database Management Systems</option>
+          <option value="CS303">CS303 - Design & Analysis of Algorithms</option>
+        </select>
+      </div>
+      <div class="col-md-7 text-md-end pt-md-3">
+        <span class="badge bg-primary-subtle text-primary border border-primary-subtle p-2">
+          <i class="bi bi-star-fill text-warning me-1"></i> Student Evaluation Ratings
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Top Metrics Row -->
+  <div class="row g-4 mb-4">
+    <div class="col-md-4">
+      <div class="cf-card p-4 h-100 d-flex flex-column justify-content-between text-center">
+        <div>
+          <div class="text-muted small fw-semibold text-uppercase">Average Rating</div>
+          <h1 class="display-4 fw-bold text-primary my-2" id="feedbackAvgScore">4.5</h1>
+          <div class="d-flex justify-content-center text-warning fs-5 mb-2">
+            <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-half"></i>
+          </div>
+        </div>
+        <div class="badge bg-light text-secondary border p-2" id="feedbackTotalResponses">4 Responses</div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="cf-card p-4 h-100">
+        <h6 class="fw-bold text-dark mb-3"><i class="bi bi-pie-chart text-primary me-2"></i>Rating Breakdown</h6>
+        <div style="height: 180px; position: relative;">
+          <canvas id="feedbackDistChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="cf-card p-4 h-100">
+        <h6 class="fw-bold text-dark mb-3"><i class="bi bi-bar-chart-steps text-primary me-2"></i>Category Averages</h6>
+        <div id="feedbackCategoriesList">
+          <!-- Populated by records.js -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Feedback Form Card (Interactive Submission) -->
+  <div class="cf-card p-4 mb-4">
+    <h6 class="fw-bold text-dark mb-2">
+      <i class="bi bi-pencil-square text-primary me-1"></i> Collect Course Feedback
+    </h6>
+    <p class="text-secondary small mb-3">Submit student feedback with a rating (1 to 5) and an optional comment.</p>
+    <form id="submitFeedbackForm">
+      <div class="row g-3">
+        <div class="col-md-3">
+          <label for="feedbackRatingInput" class="form-label small fw-semibold text-dark">Rating (1 to 5 Stars) <span class="text-danger">*</span></label>
+          <select id="feedbackRatingInput" class="form-select form-select-sm" required>
+            <option value="5" selected>5 Stars - Excellent</option>
+            <option value="4">4 Stars - Very Good</option>
+            <option value="3">3 Stars - Good</option>
+            <option value="2">2 Stars - Fair</option>
+            <option value="1">1 Star - Poor</option>
+          </select>
+        </div>
+        <div class="col-md-9">
+          <label for="feedbackCommentInput" class="form-label small fw-semibold text-dark">Optional Student Comment</label>
+          <div class="input-group input-group-sm">
+            <input type="text" class="form-control" id="feedbackCommentInput" placeholder="Enter student observations or suggestions...">
+            <button class="btn btn-primary" type="submit">
+              <i class="bi bi-send me-1"></i> Submit Feedback
+            </button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- Qualitative Feedback Section -->
+  <div class="cf-card mb-4">
+    <div class="cf-card-header">
+      <h6 class="cf-card-title">
+        <i class="bi bi-chat-quote text-primary"></i> Student Feedback Comments
+      </h6>
+      <span class="small text-muted">Feedback records for course evaluation</span>
+    </div>
+    <div class="cf-card-body" id="feedbackCommentsList">
+      <!-- Populated by records.js -->
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/records.js') }}"></script>
+{% endblock %}

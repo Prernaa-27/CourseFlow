@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}Faculty-Course Assignments{% endblock %}
+{% block breadcrumb %}Administration / Faculty Assignments{% endblock %}
+
+{% block content %}
+<div id="adminAssignmentsRoot">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div>
+      <h2 class="page-title">Faculty-Course Teaching Assignments</h2>
+      <p class="page-subtitle">Allocate faculty instructors to semester course offerings and manage academic workload distribution.</p>
+    </div>
+  </div>
+
+  <!-- Assignments Table Card -->
+  <div class="cf-card mb-4">
+    <div class="cf-card-header">
+      <h6 class="cf-card-title">
+        <i class="bi bi-person-lines-fill text-primary"></i> Current Teaching Allocations (2024-2025)
+      </h6>
+      <span class="small text-muted">Click "Change Assignment" to reassign lead instructors.</span>
+    </div>
+    <div class="cf-table-wrapper">
+      <table class="cf-table">
+        <thead>
+          <tr>
+            <th>Course</th>
+            <th>Semester & Cycle</th>
+            <th>Assigned Faculty Instructor</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="assignmentsTableTbody">
+          <!-- Dynamically populated by admin.js -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Assign Modal -->
+<div class="modal fade" id="assignModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="border-radius: var(--radius-lg);">
+      <div class="modal-header border-bottom">
+        <h5 class="modal-title fw-bold text-dark">Modify Faculty Assignment</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form id="assignModalForm">
+        <div class="modal-body p-4">
+          <input type="hidden" id="assignCourseId">
+          <div class="mb-3">
+            <label class="form-label small fw-semibold text-muted">Course:</label>
+            <div class="fw-bold text-dark fs-6" id="assignCourseLabel">CS301 - Software Engineering</div>
+          </div>
+
+          <div class="mb-3">
+            <label for="assignFacultySelect" class="form-label small fw-semibold text-dark">Select New Lead Faculty Instructor <span class="text-danger">*</span></label>
+            <select class="form-select form-select-sm" id="assignFacultySelect" required>
+              <!-- Populated dynamically -->
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer border-top bg-light">
+          <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary btn-sm px-3">Update Assignment</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+{% endblock %}
