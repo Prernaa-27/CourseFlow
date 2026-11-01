@@ -8,11 +8,11 @@
 // ==========================================================================
 const DEFAULT_STORE = {
   currentUser: {
-    name: 'Dr. Sarah Jenkins',
+    name: 'Mr. XYZ',
     email: 'faculty@courseflow.demo',
     role: 'faculty', // 'faculty' or 'admin'
     department: 'Computer Science & Engineering',
-    avatar: 'SJ'
+    avatar: 'XYZ'
   },
   courses: [
     {
@@ -21,7 +21,7 @@ const DEFAULT_STORE = {
       title: 'Software Engineering',
       semester: 'Semester 5',
       academicYear: '2024-2025',
-      faculty: 'Dr. Sarah Jenkins',
+      faculty: 'Mr. XYZ',
       facultyEmail: 'faculty@courseflow.demo',
       studentsCount: 58,
       completion: 88,
@@ -36,7 +36,7 @@ const DEFAULT_STORE = {
       title: 'Database Management Systems',
       semester: 'Semester 5',
       academicYear: '2024-2025',
-      faculty: 'Dr. Sarah Jenkins',
+      faculty: 'Mr. XYZ',
       facultyEmail: 'faculty@courseflow.demo',
       studentsCount: 62,
       completion: 100,
@@ -66,7 +66,7 @@ const DEFAULT_STORE = {
       title: 'Cloud Computing & DevOps',
       semester: 'Semester 7',
       academicYear: '2024-2025',
-      faculty: 'Dr. Sarah Jenkins',
+      faculty: 'Mr. XYZ',
       facultyEmail: 'faculty@courseflow.demo',
       studentsCount: 48,
       completion: 88,
@@ -81,7 +81,7 @@ const DEFAULT_STORE = {
       title: 'Object-Oriented Programming (Java)',
       semester: 'Semester 3',
       academicYear: '2024-2025',
-      faculty: 'Dr. Sarah Jenkins',
+      faculty: 'Mr. XYZ',
       facultyEmail: 'faculty@courseflow.demo',
       studentsCount: 65,
       completion: 38,
@@ -94,7 +94,7 @@ const DEFAULT_STORE = {
   faculty: [
     {
       id: 'FAC01',
-      name: 'Dr. Sarah Jenkins',
+      name: 'Mr. XYZ',
       email: 'faculty@courseflow.demo',
       role: 'Associate Professor',
       department: 'Computer Science & Engineering',
@@ -331,7 +331,7 @@ const DEFAULT_STORE = {
 // ==========================================================================
 // 2. DATA PERSISTENCE & LOCALSTORAGE ADAPTER
 // ==========================================================================
-const STORAGE_KEY = 'courseflow_store_v3'; // Bumped for comprehensive attainment analytics
+const STORAGE_KEY = 'courseflow_store_v4'; // Bumped for comprehensive attainment analytics
 
 class DataStore {
   constructor() {
@@ -391,11 +391,11 @@ const apiService = {
       };
     } else {
       db.data.currentUser = {
-        name: 'Dr. Sarah Jenkins',
+        name: 'Mr. XYZ',
         email: 'faculty@courseflow.demo',
         role: 'faculty',
         department: 'Computer Science & Engineering',
-        avatar: 'SJ'
+        avatar: 'XYZ'
       };
     }
     db.save(db.data);

@@ -32,7 +32,7 @@
         </div>
         <div class="brand-text">
           <span class="brand-title">CourseFlow</span>
-          <span class="brand-subtitle">University System</span>
+          <span class="brand-subtitle">BML Munjal University</span>
         </div>
       </a>
     </div>
@@ -118,7 +118,7 @@
             {{ user.avatar if user else 'CF' }}
           </div>
           <div style="line-height:1.15;">
-            <div class="fw-semibold text-white small" style="font-size:0.78rem;">{{ user.name if user else 'Dr. Sarah Jenkins' }}</div>
+            <div class="fw-semibold text-white small" style="font-size:0.78rem;">{{ user.name if user else 'Mr. XYZ' }}</div>
             <div style="color: var(--sidebar-text-muted); font-size:0.68rem;">{{ user.department if user else 'Dept of CSE' }}</div>
           </div>
         </div>
@@ -162,14 +162,14 @@
               {{ user.avatar if user else 'CF' }}
             </div>
             <div class="user-info-text d-none d-md-block">
-              <span class="user-info-name">{{ user.name if user else 'Dr. Sarah Jenkins' }}</span>
+              <span class="user-info-name">{{ user.name if user else 'Mr. XYZ' }}</span>
               <span class="user-info-role text-capitalize">{{ user.role if user else 'Faculty' }}</span>
             </div>
             <i class="bi bi-chevron-down text-muted small ms-1"></i>
           </button>
           <ul class="dropdown-menu dropdown-menu-end shadow-sm" style="min-width: 220px;">
             <li class="px-3 py-2 border-bottom">
-              <div class="fw-semibold text-dark small">{{ user.name if user else 'Dr. Sarah Jenkins' }}</div>
+              <div class="fw-semibold text-dark small">{{ user.name if user else 'Mr. XYZ' }}</div>
               <div class="text-muted small" style="font-size:0.75rem;">{{ user.email if user else 'faculty@courseflow.demo' }}</div>
             </li>
             <li class="p-2 border-bottom">
@@ -195,7 +195,7 @@
 
     <!-- Footer -->
     <footer class="p-3 text-center text-muted border-top bg-white small" style="font-size: 0.78rem;">
-      CourseFlow &bull; University Course File Management System &bull; Software Engineering Laboratory Project
+      CourseFlow &bull; BML Munjal University &bull; Course File Management System
     </footer>
   </div>
 </div>

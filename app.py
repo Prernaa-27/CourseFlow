@@ -29,7 +29,7 @@ DEMO_COURSES = [
         "title": "Software Engineering",
         "semester": "Semester 5",
         "academicYear": "2024-2025",
-        "faculty": "Dr. Sarah Jenkins",
+        "faculty": "Mr. XYZ",
         "facultyEmail": "faculty@courseflow.demo",
         "studentsCount": 58,
         "completion": 85,
@@ -44,7 +44,7 @@ DEMO_COURSES = [
         "title": "Database Management Systems",
         "semester": "Semester 5",
         "academicYear": "2024-2025",
-        "faculty": "Dr. Sarah Jenkins",
+        "faculty": "Mr. XYZ",
         "facultyEmail": "faculty@courseflow.demo",
         "studentsCount": 62,
         "completion": 100,
@@ -74,7 +74,7 @@ DEMO_COURSES = [
         "title": "Cloud Computing & DevOps",
         "semester": "Semester 7",
         "academicYear": "2024-2025",
-        "faculty": "Dr. Sarah Jenkins",
+        "faculty": "Mr. XYZ",
         "facultyEmail": "faculty@courseflow.demo",
         "studentsCount": 48,
         "completion": 94,
@@ -89,7 +89,7 @@ DEMO_COURSES = [
         "title": "Object-Oriented Programming (Java)",
         "semester": "Semester 3",
         "academicYear": "2024-2025",
-        "faculty": "Dr. Sarah Jenkins",
+        "faculty": "Mr. XYZ",
         "facultyEmail": "faculty@courseflow.demo",
         "studentsCount": 65,
         "completion": 38,
@@ -102,11 +102,11 @@ DEMO_COURSES = [
 
 DEMO_USERS = {
     "faculty@courseflow.demo": {
-        "name": "Dr. Sarah Jenkins",
+        "name": "Mr. XYZ",
         "email": "faculty@courseflow.demo",
         "role": "faculty",
         "department": "Computer Science & Engineering",
-        "avatar": "SJ"
+        "avatar": "XYZ"
     },
     "admin@courseflow.demo": {
         "name": "Prof. Rajesh Sharma",
