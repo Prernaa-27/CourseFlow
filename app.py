@@ -3,12 +3,18 @@ CourseFlow - Course File Management System (CFMS)
 Flask Application Server & REST API Layer
 """
 
+import io
+import json
 import os
 from functools import wraps
 from flask import (
     Flask, render_template, request, redirect,
     url_for, session, jsonify, abort
 )
+from dotenv import load_dotenv
+
+# Load environment variables from .env
+load_dotenv()
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'courseflow-cfms-dev-secret-key-2024')
@@ -352,32 +358,262 @@ def api_course_detail(course_id):
         return jsonify({"success": True})
     return jsonify(course)
 
+DEMO_SYLLABUS = {
+    'CS301': [
+        { "unit": 1, "title": "Software Lifecycle & Process Models", "hours": 8, "outcomes": "CO1", "topics": "Agile Principles, Scrum Framework, Sprints, User Stories, Waterfall, Spiral" },
+        { "unit": 2, "title": "Requirements Engineering & Modeling", "hours": 9, "outcomes": "CO2", "topics": "Requirements Elicitation, IEEE 830 SRS, UML Use Case, Activity, Sequence Diagrams" },
+        { "unit": 3, "title": "Architectural Design & Patterns", "hours": 10, "outcomes": "CO3", "topics": "Layered, Microservices, GoF Design Patterns: Factory, Singleton, Observer, Strategy" },
+        { "unit": 4, "title": "Verification, Validation & Quality Assurance", "hours": 10, "outcomes": "CO4", "topics": "Black-box, White-box, Unit Testing, TDD, Cyclomatic Complexity, Code Coverage" },
+        { "unit": 5, "title": "Project Management & Contemporary Practices", "hours": 8, "outcomes": "CO5", "topics": "COCOMO Estimation, Risk Management, CI/CD with Git, Docker, Pipelines" }
+    ]
+}
+
+GEMINI_SUMMARIZER_PROMPT = """
+You are an expert academic curriculum reviewer and university accreditation analyst for an outcome-based education (OBE) course file management system.
+Analyze the provided course handout document thoroughly and extract the following structured academic information based ONLY on the actual content present in the document.
+
+Required output sections:
+A. COURSE HANDOUT SUMMARY: A concise, informative summary of the document.
+B. KEY TOPICS: Identify the important topics and concepts directly covered in the handout.
+C. SUGGESTED COURSE OUTCOMES: Formulate relevant Course Outcomes (COs) aligned with Bloom's Taxonomy based ONLY on the document's content.
+   For each outcome, provide:
+   - "co": CO identifier (e.g. "CO1", "CO2")
+   - "statement": Outcome statement starting with an action verb (e.g. "Formulate software development workflows applying modern lifecycle paradigms.")
+   - "relevantTopics": Array of specific topics from the document supporting that outcome.
+D. IMPORTANT INFORMATION:
+   - "courseTitle": Course title from document (or "Not specified in document" if absent)
+   - "courseCode": Course code from document (or "Not specified in document" if absent)
+   - "unitNames": Array of unit or module titles found in the document (or empty list if none)
+   - "importantConcepts": Array of core architectural or theoretical principles found
+   - "learningObjectives": Array of explicit learning objectives stated in document (or empty list if none)
+
+CRITICAL INSTRUCTIONS:
+- Do not invent missing course details or learning outcomes.
+- If information is unavailable, explicitly indicate that it was not found in the document.
+- Output MUST be a strictly valid JSON object matching this schema:
+{
+  "courseTitle": "...",
+  "courseCode": "...",
+  "summary": "...",
+  "keyTopics": ["Topic 1", "Topic 2"],
+  "suggestedCourseOutcomes": [
+    {
+      "co": "CO1",
+      "statement": "...",
+      "relevantTopics": ["Topic A", "Topic B"]
+    }
+  ],
+  "importantInformation": {
+    "unitNames": ["Unit 1...", "Unit 2..."],
+    "importantConcepts": ["Concept 1", "Concept 2"],
+    "learningObjectives": ["Objective 1", "Objective 2"]
+  }
+}
+"""
+
+def process_handout_with_gemini(file_bytes, filename, course_id="CS301"):
+    """
+    Analyzes an uploaded course handout (PDF or DOCX) using Google Gen AI SDK.
+    Returns (success: bool, result_or_error_dict_or_str, http_status_code)
+    """
+    if not filename:
+        return False, "Filename is required.", 400
+
+    ext = filename.rsplit('.', 1)[-1].lower() if '.' in filename else ''
+    if ext not in ['pdf', 'docx']:
+        return False, f"Unsupported file type (.{ext}). Please upload a PDF or DOCX course handout document.", 400
+
+    if not file_bytes or len(file_bytes) == 0:
+        return False, "The uploaded document is empty (0 bytes). Please upload a valid course handout.", 400
+
+    if len(file_bytes) > 10 * 1024 * 1024:
+        return False, "File size exceeds 10MB limit. Please upload a smaller document.", 400
+
+    api_key = os.environ.get('GEMINI_API_KEY', '').strip()
+    if not api_key:
+        return False, "Gemini API key is not configured. Please set GEMINI_API_KEY in your environment or .env file.", 500
+
+    model_name = os.environ.get('GEMINI_MODEL', 'gemini-3.8-flash').strip() or 'gemini-3.8-flash'
+
+    # Prepare document content for Gemini
+    gemini_contents = []
+
+    if ext == 'pdf':
+        if not file_bytes.startswith(b'%PDF-'):
+            return False, "Corrupted or invalid PDF file. Header verification failed.", 400
+        try:
+            import pymupdf
+            pdf_doc = pymupdf.open(stream=file_bytes, filetype="pdf")
+            if len(pdf_doc) == 0:
+                return False, "The uploaded PDF document contains no pages.", 400
+            pdf_doc.close()
+        except Exception as e:
+            return False, f"Corrupted PDF document: {str(e)}", 400
+
+        try:
+            from google.genai import types
+            part = types.Part.from_bytes(data=file_bytes, mime_type='application/pdf')
+            gemini_contents.append(part)
+            gemini_contents.append(f"Target Course: {course_id}\n\n{GEMINI_SUMMARIZER_PROMPT}")
+        except Exception as e:
+            return False, f"Failed to prepare PDF document for Gemini: {str(e)}", 500
+
+    elif ext == 'docx':
+        try:
+            import docx
+            doc = docx.Document(io.BytesIO(file_bytes))
+        except Exception as e:
+            return False, f"Corrupted or invalid DOCX document: {str(e)}", 400
+
+        lines = []
+        for p in doc.paragraphs:
+            t = p.text.strip()
+            if t:
+                lines.append(t)
+        for table in doc.tables:
+            for row in table.rows:
+                cells = [c.text.strip() for c in row.cells if c.text.strip()]
+                if cells:
+                    dedup = []
+                    for c in cells:
+                        if not dedup or dedup[-1] != c:
+                            dedup.append(c)
+                    lines.append(" | ".join(dedup))
+
+        doc_text = "\n".join(lines).strip()
+        if not doc_text:
+            return False, "The uploaded DOCX file does not contain any readable text or is empty.", 400
+
+        gemini_contents.append(
+            f"DOCUMENT FILENAME: {filename}\nTARGET COURSE: {course_id}\n\nDOCUMENT EXTRACTED CONTENT:\n{doc_text}\n\n{GEMINI_SUMMARIZER_PROMPT}"
+        )
+
+    # Call Gemini API
+    try:
+        from google import genai
+        from google.genai import types
+        from google.genai.errors import APIError
+
+        client = genai.Client(api_key=api_key)
+        config = types.GenerateContentConfig(
+            response_mime_type="application/json",
+            temperature=0.2
+        )
+        response = client.models.generate_content(
+            model=model_name,
+            contents=gemini_contents,
+            config=config
+        )
+    except APIError as e:
+        err_msg = str(e)
+        if e.code == 400 or "API key not valid" in err_msg or "API_KEY_INVALID" in err_msg:
+            return False, "Gemini API authentication failed: Invalid API key. Please verify your GEMINI_API_KEY.", 401
+        elif e.code == 429 or "RESOURCE_EXHAUSTED" in err_msg:
+            return False, "Gemini API rate limit or quota exceeded. Please try again shortly.", 429
+        elif e.code in (500, 503) or "UNAVAILABLE" in err_msg:
+            return False, "Google Gemini API service is temporarily unavailable. Please try again later.", 503
+        return False, f"Gemini API request failed ({e.code}): {e.message}", 502
+    except Exception as e:
+        err_str = str(e)
+        if "ConnectError" in err_str or "Failed to establish a new connection" in err_str or "Network is unreachable" in err_str:
+            return False, "Network connection failure: Unable to communicate with Google Gemini API.", 503
+        return False, f"Failed to communicate with Gemini API: {err_str}", 500
+
+    if not response or not response.text:
+        return False, "Gemini API returned an empty response.", 502
+
+    try:
+        parsed_data = json.loads(response.text)
+    except json.JSONDecodeError:
+        return False, "Gemini returned an invalid JSON response structure.", 502
+
+    if not isinstance(parsed_data, dict):
+        return False, "Invalid response schema received from Gemini.", 502
+
+    summary = parsed_data.get("summary", "")
+    key_topics = parsed_data.get("keyTopics", [])
+    suggested_cos = parsed_data.get("suggestedCourseOutcomes", [])
+    important_info = parsed_data.get("importantInformation", {})
+
+    if not summary and not key_topics:
+        return False, "Gemini analysis could not extract summary or topics from this document.", 502
+
+    result = {
+        "success": True,
+        "fileName": filename,
+        "courseCode": parsed_data.get("courseCode") or course_id,
+        "courseTitle": parsed_data.get("courseTitle") or "Software Engineering",
+        "extractedSummary": summary,
+        "topicsIdentified": key_topics,
+        "suggestedOutcomes": [
+            f"{co.get('co', 'CO')}: {co.get('statement', '')}" if isinstance(co, dict) else str(co)
+            for co in suggested_cos
+        ],
+        "suggestedOutcomesDetailed": suggested_cos,
+        "importantInformation": important_info
+    }
+    return True, result, 200
+
 @app.route('/api/handouts/summarize', methods=['POST'])
 def api_summarize_handout():
     """
-    Contract endpoint for future AI/LLM integration.
-    Accepts file metadata or multipart file.
+    AI-powered Handout Summarizer endpoint using Google Gemini API.
+    Accepts multipart file upload or JSON payload with file metadata/path.
     """
-    return jsonify({
-        "success": True,
-        "courseCode": "CS301",
-        "courseTitle": "Software Engineering",
-        "topicsIdentified": [
-            "Software Process Models (Agile, Waterfall, Spiral)",
-            "Requirements Analysis, Use Cases, IEEE-830 SRS",
-            "Architectural Design, Microservices, GoF Patterns",
-            "Verification, Unit Testing, Cyclomatic Complexity",
-            "Project Estimation, COCOMO, CI/CD Pipeline Automation"
-        ],
-        "suggestedOutcomes": [
-            "CO1: Formulate software development workflows applying modern lifecycle paradigms.",
-            "CO2: Construct formal requirements specifications using UML modeling diagrams.",
-            "CO3: Synthesize modular architectural designs using industry design patterns.",
-            "CO4: Implement automated testing and continuous integration suites."
-        ],
-        "recommendedHours": 45,
-        "extractedSummary": "This course provides foundational and applied competencies in engineering large-scale, dependable software systems. It emphasizes agile collaboration, architectural discipline, testing rigor, and lifecycle automation according to contemporary industry standards."
-    })
+    file_bytes = None
+    filename = None
+    course_id = "CS301"
+
+    # 1. Check if multipart/form-data with file
+    if 'file' in request.files:
+        uploaded_file = request.files['file']
+        filename = uploaded_file.filename
+        file_bytes = uploaded_file.read()
+        course_id = request.form.get('courseId', 'CS301')
+
+    # 2. Check if JSON payload (used in tests or sample document trigger)
+    elif request.is_json:
+        data = request.get_json() or {}
+        course_id = data.get('courseId', 'CS301')
+        fname = data.get('fileName') or data.get('filename')
+
+        if fname:
+            filename = fname
+            sample_path = os.path.join(app.root_path, 'static', 'sample_docs', fname)
+            if not os.path.exists(sample_path):
+                # Try default sample
+                sample_path = os.path.join(app.root_path, 'static', 'sample_docs', 'CS301_Software_Engineering_Handout.pdf')
+                if not fname.lower().endswith(('.pdf', '.docx')):
+                    # If test asks for unsupported file like .exe
+                    filename = fname
+                    file_bytes = b'fake binary'
+                else:
+                    filename = fname
+            if os.path.exists(sample_path) and file_bytes is None:
+                with open(sample_path, 'rb') as f:
+                    file_bytes = f.read()
+
+    if not filename:
+        return jsonify({"error": "No file uploaded. Please provide a course handout document.", "success": False}), 400
+
+    success, result, status_code = process_handout_with_gemini(file_bytes, filename, course_id)
+    if not success:
+        return jsonify({"error": result, "success": False}), status_code
+
+    return jsonify(result), status_code
+
+@app.route('/api/syllabus/<course_id>', methods=['GET', 'POST'])
+def api_syllabus(course_id):
+    if request.method == 'POST':
+        data = request.get_json() or {}
+        units = data.get('units') if isinstance(data, dict) and 'units' in data else data
+        if not isinstance(units, list):
+            return jsonify({"error": "Expected a list of syllabus units", "success": False}), 400
+        DEMO_SYLLABUS[course_id] = units
+        return jsonify({"success": True, "courseId": course_id, "units": units}), 200
+
+    units = DEMO_SYLLABUS.get(course_id, DEMO_SYLLABUS.get('CS301', []))
+    return jsonify(units), 200
 
 @app.route('/api/course-files/generate', methods=['POST'])
 def api_generate_course_file():

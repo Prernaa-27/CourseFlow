@@ -734,32 +734,30 @@ const apiService = {
     return cf;
   },
 
-  // AI Assistant Handout Summarizer (Demonstration Handler)
-  async summarizeHandout(fileData) {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve({
-          success: true,
-          courseCode: 'CS301',
-          courseTitle: 'Software Engineering',
-          topicsIdentified: [
-            'Software Development Lifecycle (Agile & Waterfall)',
-            'Requirements Engineering & IEEE SRS Document',
-            'Software Architecture & Common Design Patterns',
-            'Unit Testing Principles & Verification',
-            'Project Planning, Effort Estimation & Version Control'
-          ],
-          suggestedOutcomes: [
-            'CO1: Explain software lifecycle models and agile development practices.',
-            'CO2: Formulate functional and non-functional requirements specifications.',
-            'CO3: Apply modular architecture and design patterns to software problems.',
-            'CO4: Write and execute unit tests to ensure software quality.'
-          ],
-          recommendedHours: 45,
-          extractedSummary: 'This course provides core foundations in engineering reliable software systems, covering lifecycle models, requirements analysis, modular architectural design, testing methodologies, and project collaboration.'
-        });
-      }, 700);
-    });
+  // AI Assistant Handout Summarizer (Google Gemini API Integration)
+  async summarizeHandout(payload) {
+    let options = { method: 'POST' };
+
+    if (payload instanceof FormData) {
+      options.body = payload;
+    } else {
+      options.headers = { 'Content-Type': 'application/json' };
+      options.body = JSON.stringify(payload);
+    }
+
+    const response = await fetch('/api/handouts/summarize', options);
+    let result = null;
+    try {
+      result = await response.json();
+    } catch (e) {
+      throw new Error('Server returned status ' + response.status + ' with non-JSON response.');
+    }
+
+    if (!response.ok || !result.success) {
+      throw new Error(result.error || ('Gemini API analysis failed with HTTP status ' + response.status));
+    }
+
+    return result;
   },
 
   // Notifications
