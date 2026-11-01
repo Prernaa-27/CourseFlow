@@ -260,14 +260,45 @@ const DEFAULT_STORE = {
   attainment: {
     'CS301': {
       targetBenchmark: 70.0,
+      summary: {
+        overallAttainment: 77.34,
+        directAttainment: 78.5,
+        indirectAttainment: 74.2
+      },
+      overallAverage: 77.34,
       outcomes: [
-        { code: 'CO1', target: 70.0, achieved: 81.2, status: 'Meets Target', diff: '+11.2%' },
-        { code: 'CO2', target: 70.0, achieved: 78.8, status: 'Meets Target', diff: '+8.8%' },
-        { code: 'CO3', target: 70.0, achieved: 73.6, status: 'Meets Target', diff: '+3.6%' },
-        { code: 'CO4', target: 70.0, achieved: 68.5, status: 'Below Target', diff: '-1.5%' },
-        { code: 'CO5', target: 70.0, achieved: 83.3, status: 'Meets Target', diff: '+13.3%' }
+        { code: 'CO1', target: 70.0, internal: 82.5, external: 81.0, indirect: 80.5, achieved: 81.4, status: 'Meets Target', diff: '+11.4%' },
+        { code: 'CO2', target: 70.0, internal: 79.0, external: 78.5, indirect: 80.0, achieved: 78.9, status: 'Meets Target', diff: '+8.9%' },
+        { code: 'CO3', target: 70.0, internal: 74.0, external: 72.0, indirect: 76.0, achieved: 73.4, status: 'Meets Target', diff: '+3.4%' },
+        { code: 'CO4', target: 75.0, internal: 68.0, external: 66.5, indirect: 72.0, achieved: 68.1, status: 'Below Target', diff: '-6.9%' },
+        { code: 'CO5', target: 70.0, internal: 84.0, external: 83.0, indirect: 85.0, achieved: 83.7, status: 'Meets Target', diff: '+13.7%' }
       ],
-      overallAverage: 77.1
+      poAttainment: {
+        'PO1': 2.65, 'PO2': 2.45, 'PO3': 2.80, 'PO4': 2.10, 'PO5': 2.50,
+        'PO6': 2.20, 'PO7': 2.30, 'PO8': 2.75, 'PO9': 2.60, 'PO10': 2.40,
+        'PO11': 2.55, 'PO12': 2.70, 'PSO1': 2.85, 'PSO2': 2.75
+      }
+    },
+    'CS302': {
+      targetBenchmark: 70.0,
+      summary: {
+        overallAttainment: 82.10,
+        directAttainment: 83.0,
+        indirectAttainment: 80.0
+      },
+      overallAverage: 82.10,
+      outcomes: [
+        { code: 'CO1', target: 70.0, internal: 85.0, external: 84.0, indirect: 82.0, achieved: 83.9, status: 'Meets Target', diff: '+13.9%' },
+        { code: 'CO2', target: 70.0, internal: 81.0, external: 80.0, indirect: 80.0, achieved: 80.3, status: 'Meets Target', diff: '+10.3%' },
+        { code: 'CO3', target: 70.0, internal: 83.0, external: 82.5, indirect: 81.0, achieved: 82.3, status: 'Meets Target', diff: '+12.3%' },
+        { code: 'CO4', target: 70.0, internal: 79.5, external: 81.0, indirect: 80.0, achieved: 80.4, status: 'Meets Target', diff: '+10.4%' },
+        { code: 'CO5', target: 70.0, internal: 84.0, external: 83.5, indirect: 83.0, achieved: 83.6, status: 'Meets Target', diff: '+13.6%' }
+      ],
+      poAttainment: {
+        'PO1': 2.80, 'PO2': 2.70, 'PO3': 2.90, 'PO4': 2.40, 'PO5': 2.60,
+        'PO6': 2.35, 'PO7': 2.45, 'PO8': 2.80, 'PO9': 2.70, 'PO10': 2.50,
+        'PO11': 2.65, 'PO12': 2.75, 'PSO1': 2.90, 'PSO2': 2.80
+      }
     }
   },
   // Essential 8-Section Course File Checklist
@@ -300,7 +331,7 @@ const DEFAULT_STORE = {
 // ==========================================================================
 // 2. DATA PERSISTENCE & LOCALSTORAGE ADAPTER
 // ==========================================================================
-const STORAGE_KEY = 'courseflow_store_v2'; // Bumped for simplified clean demo store
+const STORAGE_KEY = 'courseflow_store_v3'; // Bumped for comprehensive attainment analytics
 
 class DataStore {
   constructor() {
@@ -638,7 +669,11 @@ const apiService = {
 
   // Attainment
   async getAttainment(courseId) {
-    return db.data.attainment[courseId] || null;
+    if (db.data.attainment && db.data.attainment[courseId]) {
+      return db.data.attainment[courseId];
+    }
+    // Return CS301 attainment as robust default so page never renders empty
+    return (db.data.attainment && db.data.attainment['CS301']) || DEFAULT_STORE.attainment['CS301'];
   },
 
   // Course File (8 Essential Sections)
