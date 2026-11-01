@@ -76,8 +76,6 @@ The project is intentionally scoped and simplified so engineering students can e
 - **Typography**: Google Fonts Inter
 - **Testing**: Pytest automated test suite
 
-> **No Heavy Frameworks**: No React, Vue, Angular, Next.js, TypeScript, Tailwind, or Node.js build tools. The project runs out-of-the-box on standard Python with zero build steps.
-
 ---
 
 ## 3. Project Directory Structure
@@ -178,29 +176,5 @@ All 10 test cases verify:
 
 ---
 
-## 7. Viva & Lab Defense Talking Points
-
-When presenting this project during a software engineering evaluation:
-
-1. **Architecture (MVC)**:
-   - *Model*: Structured dictionary data in `app.py` mirrored by the reactive `localStorage` store in `static/js/app.js`.
-   - *View*: Reusable Jinja templates inheriting from `base.html` with Bootstrap 5 and clean CSS tokens.
-   - *Controller*: Flask route handlers coupled with modular vanilla JavaScript controllers.
-
-2. **Decoupled Client Store**:
-   - The application uses `CourseFlow.apiService` in `app.js`. If a backend database is connected in the future, only the service methods need to fetch from SQL endpoints—no template rewriting is required.
-   - Every button and form performs a tangible action (adds a unit, logs marks, marks attendance, submits feedback, updates checklist).
-
-3. **Explainable Mathematics**:
-   - Attendance percentage: `(Present Sessions / Total Sessions) * 100`.
-   - Assessment marks percentage: `(Marks / Max Marks) * 100`.
-   - Course file completeness: `(Completed Sections / 8) * 100`.
-   - Outcome mapping: Simple 0 to 3 scale (Unmapped, Low, Medium, High).
-
-4. **Honest AI Simulation**:
-   - The AI assistant clearly states it is in demonstration simulation mode with reproducible test output, highlighting the importance of human-in-the-loop faculty verification before records are saved.
-
----
-
-## 8. License & Academic Context
+## 7. License & Academic Context
 Developed for academic assessment in **Software Engineering (CS301)**. All student records, roll numbers, and course data are synthetic demonstration data.
