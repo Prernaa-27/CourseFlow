@@ -499,11 +499,22 @@ def process_handout_with_gemini(file_bytes, filename, course_id="CS301"):
             response_mime_type="application/json",
             temperature=0.2
         )
-        response = client.models.generate_content(
-            model=model_name,
-            contents=gemini_contents,
-            config=config
-        )
+        response = None
+        for attempt in range(3):
+            try:
+                response = client.models.generate_content(
+                    model=model_name,
+                    contents=gemini_contents,
+                    config=config
+                )
+                break
+            except APIError as e:
+                err_msg = str(e)
+                if (e.code in (429, 500, 503) or "RESOURCE_EXHAUSTED" in err_msg or "UNAVAILABLE" in err_msg) and attempt < 2:
+                    import time
+                    time.sleep(4 * (attempt + 1))
+                    continue
+                raise
     except APIError as e:
         err_msg = str(e)
         if e.code == 400 or "API key not valid" in err_msg or "API_KEY_INVALID" in err_msg:
@@ -626,6 +637,7 @@ def api_generate_course_file():
         "success": True,
         "courseId": course_id,
         "dossierUrl": f"/course-file/preview?course_id={course_id}",
+        "handoutUrl": f"/course-file/preview?course_id={course_id}",
         "status": "Generated"
     })
 

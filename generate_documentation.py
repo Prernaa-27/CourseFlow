@@ -19,7 +19,7 @@ This technical guide provides a comprehensive, code-accurate, and pedagogical an
 
 Every explanation in this guide is grounded in the **final, actual implementation** of the codebase:
 - **Clean University ERP Architecture:** Thinkific-inspired deep navy vertical sidebar, light-grey workspace, understated typography, and focused dashboard.
-- **Full 8-Module Implementation:** Authentication, Course Setup, Course Planning, Academic Records, Articulation Mapping, Attainment Analytics, AI Handout Summarizer (with real Google Gemini integration), and Course Dossier Compilation.
+- **Full 8-Module Implementation:** Authentication, Course Setup, Course Planning, Academic Records, Articulation Mapping, Attainment Analytics, AI Handout Summarizer (with real Google Gemini integration), and Course Handout Compilation.
 - **Accreditation Rigor:** Outcome-Based Education (OBE) formulas compliant with National Board of Accreditation (NBA) and NAAC standards.
 - **Zero Hallucination:** Clear distinction between backend-persisted records, client-side store data, and external API communication.
 
@@ -28,7 +28,7 @@ Every explanation in this guide is grounded in the **final, actual implementatio
 # PART 1: COMPLETE PROJECT OVERVIEW
 
 ### 1. What CourseFlow Is
-**CourseFlow** is an enterprise-grade, web-based **Course File Management System (CFMS)** engineered for higher education institutions, engineering colleges, and universities following Outcome-Based Education (OBE) frameworks. It provides a centralized digital workspace where faculty members and academic administrators collaborate to plan courses, track syllabus delivery, record assessment marks, maintain attendance, map Course Outcomes (COs) to Program Outcomes (POs/PSOs), evaluate direct/indirect attainment, summarize handouts with generative AI, and automatically compile audit-ready course dossiers.
+**CourseFlow** is an enterprise-grade, web-based **Course File Management System (CFMS)** engineered for higher education institutions, engineering colleges, and universities following Outcome-Based Education (OBE) frameworks. It provides a centralized digital workspace where faculty members and academic administrators collaborate to plan courses, track syllabus delivery, record assessment marks, maintain attendance, map Course Outcomes (COs) to Program Outcomes (POs/PSOs), evaluate direct/indirect attainment, summarize handouts with generative AI, and automatically compile audit-ready course handouts.
 
 ### 2. The Real-World Problem It Solves
 In traditional university departments, managing course documentation is manual, fragmented, and error-prone:
@@ -37,7 +37,7 @@ In traditional university departments, managing course documentation is manual, 
 - **Complex OBE Calculations:** Calculating NBA Course Outcome attainment requires manual weighted averaging between CIE (30%), Semester End Exams (SEE - 50%), and indirect exit surveys (20%). Faculty frequently make arithmetic errors.
 - **Accreditation Panic:** When NBA or NAAC accreditation committees visit, departments spend weeks manually verifying whether course files are complete, resulting in missing documents and compliance penalties.
 
-CourseFlow eliminates paper binders, automates all OBE formulas, provides real-time readiness tracking, and compiles a complete digital dossier with one click.
+CourseFlow eliminates paper binders, automates all OBE formulas, provides real-time readiness tracking, and compiles a complete digital course handout with one click.
 
 ### 3. Why Universities Need CourseFlow
 Modern accreditation bodies (such as the **National Board of Accreditation - NBA** under the Washington Accord, and **NAAC**) mandate continuous quality improvement (CQI). Institutions must prove that:
@@ -57,7 +57,7 @@ CourseFlow supports two primary roles:
    - Maps COs to POs and PSOs on a 0–3 correlation scale.
    - Analyzes attainment metrics and views remedial alerts.
    - Uses the AI Handout Summarizer to parse syllabi into module units.
-   - Generates and signs off on the complete course dossier.
+   - Generates and signs off on the complete course handout.
 2. **Academic Administrator (HOD / Dean / Program Coordinator):**
    - Oversees departmental course allocations.
    - Creates and updates the master course catalogue.
@@ -66,7 +66,7 @@ CourseFlow supports two primary roles:
    - Conducts internal quality audit checks before external accreditation reviews.
 
 ### 5. What a "Course File" Is and Why It Matters
-A **Course File** (also called an **Academic Course Dossier**) is the official legal and academic record of how a course was planned, delivered, and assessed during a semester. It contains eight mandatory sections:
+A **Course File** (also called an **Academic Course Handout**) is the official legal and academic record of how a course was planned, delivered, and assessed during a semester. It contains eight mandatory sections:
 1. Approved Syllabus with Unit Breakdowns & Contact Hours
 2. Session Teaching Plan & Attendance Registers
 3. Continuous Internal Evaluation (CIE) Question Papers & Evaluation Schemes
@@ -106,9 +106,9 @@ A **Course File** (also called an **Academic Course Dossier**) is the official l
   │      Overall average is 77.34%. CO3 achieved 70% (target 75%), triggering an automated
   │      Remedial Action Notice recommending bridge tutorial sessions.
   │
-  ├── 8. Dr. Jenkins opens the Course Dossier Generator (Module 8).
+  ├── 8. Dr. Jenkins opens the Course Handout Generator (Module 8).
   │      All 8 checklist sections show 100% readiness.
-  │      She clicks "Generate Course Dossier", reviews the printable audit document,
+  │      She clicks "Generate Course Handout", reviews the printable audit document,
   │      and prints / saves it as a PDF for the NBA committee.
 ```
 
@@ -168,7 +168,7 @@ CourseFlow employs a hybrid, multi-tier storage architecture designed for rapid 
 
 | Storage Tier | Where It Lives | What It Holds | Persistence Behavior |
 | :--- | :--- | :--- | :--- |
-| **1. Browser LocalStorage** | User's browser (`localStorage['courseflow_store_v3']`) | Full active database: Courses, Syllabus, Sessions, Students, Marks, Attendance, Feedback, Outcomes, Attainment, Dossier Checklist. | **Persistent across page refreshes** and browser restarts on the same machine. Automatically version-managed. |
+| **1. Browser LocalStorage** | User's browser (`localStorage['courseflow_store_v3']`) | Full active database: Courses, Syllabus, Sessions, Students, Marks, Attendance, Feedback, Outcomes, Attainment, Course Handout Checklist. | **Persistent across page refreshes** and browser restarts on the same machine. Automatically version-managed. |
 | **2. Flask Server Memory** | Python server heap (`app.py` globals: `DEMO_COURSES`, `DEMO_USERS`, `DEMO_SYLLABUS`) | Core course list, demo credentials, active session records, syllabus sync. | **Persists while server is running**. Resets to defaults on server restart. |
 | **3. Flask Secure Sessions** | Cryptographic client cookie signed by `SECRET_KEY` | Current user identity: `email`, `name`, `role` ('faculty' or 'admin'). | **Persists until user logs out** or session cookie expires. |
 | **4. Static File Assets** | Server disk (`static/sample_docs/`) | Standard course handout PDF and DOCX files. | **Permanent disk files** committed to repository. |
@@ -192,7 +192,7 @@ CourseFlow/
 │   │   ├── ai_assistant.js           # Module 7: Gemini AI upload, extraction, and syllabus save
 │   │   ├── analytics.js              # Modules 5 & 6: Articulation matrix & attainment charts
 │   │   ├── app.js                    # Core API Service, DataStore (v3), Auth helpers, Toasts
-│   │   ├── course_file.js            # Module 8: Dossier checklist and readiness calculation
+│   │   ├── course_file.js            # Module 8: Course Handout checklist and readiness calculation
 │   │   ├── courses.js                # Module 2: Course search, filtering, add/edit/delete
 │   │   ├── dashboard.js              # Module 6: Minimalist dashboard metrics and trend chart
 │   │   └── records.js                # Modules 3 & 4: Syllabus, sessions, students, marks, attendance
@@ -212,8 +212,8 @@ CourseFlow/
 │   ├── attendance.html               # Module 4: Session attendance recording
 │   ├── base.html                     # Master layout: Sidebar, topbar, role switcher, modals
 │   ├── course_detail.html            # Course overview and metadata detail view
-│   ├── course_file.html              # Module 8: Course file dossier checklist
-│   ├── course_file_preview.html      # Module 8: Printable NBA course dossier document
+│   ├── course_file.html              # Module 8: Course file course handout checklist
+│   ├── course_file_preview.html      # Module 8: Printable NBA course handout document
 │   ├── courses.html                  # Module 2: Course catalogue grid/table
 │   ├── dashboard.html                # Module 6: Main academic dashboard
 │   ├── feedback.html                 # Module 4: Student indirect survey feedback
@@ -508,10 +508,10 @@ The implementation handles all edge cases gracefully without ever crashing or su
 
 ---
 
-## MODULE 8: Course File Dossier Generator
+## MODULE 8: Course File Course Handout Generator
 
 ### 1. What It Does
-Module 8 is the capstone of CourseFlow. It aggregates artifacts and data from all other modules into a single, comprehensive, accreditation-compliant **Course File Dossier** ready for NBA/NAAC audit inspections and printable export.
+Module 8 is the capstone of CourseFlow. It aggregates artifacts and data from all other modules into a single, comprehensive, accreditation-compliant **Course File Course Handout** ready for NBA/NAAC audit inspections and printable export.
 
 ### 2. Source Code References
 - **Backend Routes:** [`app.py`](file:///c:/Users/Prernaa/Desktop/Sem%20V/SE/CourseFlow/app.py) lines 284–295, lines 400–415 (`/api/course-files/generate`).
@@ -519,7 +519,7 @@ Module 8 is the capstone of CourseFlow. It aggregates artifacts and data from al
 - **Client Script:** [`static/js/course_file.js`](file:///c:/Users/Prernaa/Desktop/Sem%20V/SE/CourseFlow/static/js/course_file.js).
 
 ### 3. Implementation Details
-- **The 8 Mandatory Dossier Sections:**
+- **The 8 Mandatory Course Handout Sections:**
   1. `c1`: Course Information, Syllabus & Approved Units
   2. `c2`: Course Delivery & Session Teaching Plan
   3. `c3`: Assessment Instruments & Continuous Evaluation Scheme
@@ -531,8 +531,8 @@ Module 8 is the capstone of CourseFlow. It aggregates artifacts and data from al
 - **Readiness Percentage Calculation:**
   $$\text{Readiness \%} = \left(\frac{\text{Completed Checklist Items}}{8}\right) \times 100$$
   In `CS301`, with 8 of 8 items checked, readiness is **100% (Audit Ready)**.
-- **Dossier Generation & Print/PDF Export:**
-  - Clicking "Generate Course Dossier" sends `POST /api/course-files/generate` and opens the printable preview (`/course-file/preview?course_id=CS301`).
+- **Course Handout Generation & Print/PDF Export:**
+  - Clicking "Generate Course Handout" sends `POST /api/course-files/generate` and opens the printable preview (`/course-file/preview?course_id=CS301`).
   - The preview compiles the complete document with formal institutional header, university accreditation disclaimers, tabular mark ledgers, attainment ledgers, and signature blocks.
   - Faculty can click **"Print / Save as PDF"**, which triggers `window.print()` with `@media print` CSS rules that remove sidebars and buttons, generating a clean official PDF.
 
@@ -591,7 +591,7 @@ The true strength of CourseFlow lies in its unified data pipeline. No module ope
 |                 MODULE 8: COURSE FILE DOSSIER GENERATOR                               |
 |   - Verifies 8-part checklist (100% readiness)                                        |
 |   - Compiles formal academic course file for NBA / NAAC audit                         |
-|   - Exports official printable dossier via window.print() / Save as PDF               |
+|   - Exports official printable course handout via window.print() / Save as PDF               |
 +---------------------------------------------------------------------------------------+
 ```
 
@@ -676,11 +676,11 @@ Use this exact step-by-step procedure when presenting CourseFlow to your profess
 
 ---
 
-### Step 8: Course Dossier Generation and Export (Module 8)
-1. **Navigate to:** In the sidebar under **Course Files**, click **Course Dossier** (`/course-file`).
+### Step 8: Course Handout Generation and Export (Module 8)
+1. **Navigate to:** In the sidebar under **Course Files**, click **Course Handout** (`/course-file`).
 2. **What Appears:** The 8 mandatory course file checklist items showing **100% Readiness (Audit Ready)**.
-3. **Action:** Click **"Generate Course Dossier"**.
-4. **What Appears:** Redirects to `/course-file/preview?course_id=CS301`, rendering the formal institutional course dossier with university header, syllabus units, attendance summaries, mark ledgers, attainment ledgers, and signature blocks.
+3. **Action:** Click **"Generate Course Handout"**.
+4. **What Appears:** Redirects to `/course-file/preview?course_id=CS301`, rendering the formal institutional course handout with university header, syllabus units, attendance summaries, mark ledgers, attainment ledgers, and signature blocks.
 5. **Action:** Click **"Print / Save as PDF"**.
 6. **What Appears:** The browser print dialog opens with a clean, print-optimized document ready for saving as an official PDF.
 7. **Viva Talking Point:** *"Module 8 is our final capstone. It compiles data from all seven previous modules into an official course file. Readiness percentage indicates audit preparedness, and the print engine allows instant generation of submission-ready PDFs for accreditation reviewers."*
@@ -723,10 +723,10 @@ The project includes an automated test suite implemented in `tests/test_routes.p
 | **M7-TC02** | M7: AI   | Reject .exe File | Upload `setup.exe` to `/api/handouts/summarize` | HTTP 400 Bad Request; unsupported file error | PASS | **PASS** | `test_handout.py:38`|
 | **M7-TC03** | M7: AI   | Real Gemini Summary | Real PDF uploaded to Gemini API | HTTP 200; returns real summary, topics, COs | PASS | **PASS** | `test_handout.py:63`|
 | **M7-TC04** | M7: AI   | Approve & Save | Click Approve & confirm | Approved units saved into syllabus store & API | PASS | **PASS** | `test_handout.py:108`|
-| **M8-TC01** | M8: Dossier| Dossier Checklist | Load `/course-file` | 8 checklist sections displayed | PASS | **PASS** | `course_file.js:25` |
-| **M8-TC02** | M8: Dossier| Readiness % | Check all 8 items | Readiness displays 100% (Audit Ready) | PASS | **PASS** | `course_file.js:45` |
-| **M8-TC03** | M8: Dossier| Generate Dossier | Click "Generate Course Dossier" | HTTP 200; opens `/course-file/preview` | PASS | **PASS** | `test_routes.py:141`|
-| **M8-TC04** | M8: Dossier| Printable PDF | Click "Print / Save as PDF" | Print layout opens with headers and tables | PASS | **PASS** | `course_file_preview.html:15` |
+| **M8-TC01** | M8: Course Handout| Course Handout Checklist | Load `/course-file` | 8 checklist sections displayed | PASS | **PASS** | `course_file.js:25` |
+| **M8-TC02** | M8: Course Handout| Readiness % | Check all 8 items | Readiness displays 100% (Audit Ready) | PASS | **PASS** | `course_file.js:45` |
+| **M8-TC03** | M8: Course Handout| Generate Course Handout | Click "Generate Course Handout" | HTTP 200; opens `/course-file/preview` | PASS | **PASS** | `test_routes.py:141`|
+| **M8-TC04** | M8: Course Handout| Printable PDF | Click "Print / Save as PDF" | Print layout opens with headers and tables | PASS | **PASS** | `course_file_preview.html:15` |
 
 ---
 
@@ -779,8 +779,8 @@ The project includes an automated test suite implemented in `tests/test_routes.p
 ### General & Architecture Questions
 
 #### Q1: What is CourseFlow, and what problem does it solve in a university?
-- **Level 1 (Short):** *"CourseFlow is a Course File Management System. It replaces physical paper binders with a digital platform that automates syllabus planning, attendance, marks, NBA outcome attainment, and dossier compilation."*
-- **Level 2 (Technical):** *"Universities preparing for NBA/NAAC accreditation must maintain evidence of course delivery. CourseFlow connects 8 modules across Flask and JavaScript to automate OBE calculations like 30% CIE + 50% SEE + 20% survey, reducing human calculation errors and compiling audit-ready dossiers."*
+- **Level 1 (Short):** *"CourseFlow is a Course File Management System. It replaces physical paper binders with a digital platform that automates syllabus planning, attendance, marks, NBA outcome attainment, and course handout compilation."*
+- **Level 2 (Technical):** *"Universities preparing for NBA/NAAC accreditation must maintain evidence of course delivery. CourseFlow connects 8 modules across Flask and JavaScript to automate OBE calculations like 30% CIE + 50% SEE + 20% survey, reducing human calculation errors and compiling audit-ready course handouts."*
 
 #### Q2: What technology stack did you use, and why?
 - **Level 1 (Short):** *"We used Python with Flask on the backend, JavaScript with Bootstrap 5 on the frontend, Chart.js for data visualization, and the official Google Gen AI SDK for AI summarization."*
@@ -924,13 +924,13 @@ The project includes an automated test suite implemented in `tests/test_routes.p
 
 ---
 
-### Module 8: Course File Dossier Generator Questions
+### Module 8: Course File Course Handout Generator Questions
 
-#### Q30: What are the 8 mandatory sections in the Course Dossier?
+#### Q30: What are the 8 mandatory sections in the Course Handout?
 - **Level 1 (Short):** *"Syllabus, session teaching plan, CIE question papers, marks ledgers, CO-PO mapping matrix, attainment reports, student feedback, and sample answer scripts."*
 - **Level 2 (Technical):** *"Sections `c1` through `c8` match NBA Criterion 3 guidelines: Approved Syllabus & Contact Hours, Lesson Delivery Logs, Evaluation Instruments, Continuous Marks Registers, 5x14 Articulation Matrix, Direct/Indirect Attainment Calculations, Student Survey CQI Reports, and Representative Best/Weak Student Answer Scripts."*
 
-#### Q31: How is the Dossier Readiness percentage computed?
+#### Q31: How is the Course Handout Readiness percentage computed?
 - **Level 1 (Short):** *"It divides the number of completed checklist items by 8 and multiplies by 100."*
 - **Level 2 (Technical):** *"Formula: `(completedCount / 8) * 100`. When all 8 items are toggled active in `course_file.js`, readiness is 100%, indicating the file is audit-ready for accreditation reviewers."*
 
@@ -1016,7 +1016,7 @@ The project includes an automated test suite implemented in `tests/test_routes.p
 > 5. *It implements the official **CO-PO Articulation Matrix** on a 0 to 3 scale.*
 > 6. *It automates **Attainment Analytics** (30% CIE + 50% SEE + 20% survey), automatically generating **Remedial Action Plans** for below-target outcomes.*
 > 7. *It integrates **Google Gemini AI** to automatically read syllabus PDFs and Word documents, extract topics, formulate Bloom's outcomes, and save them into the syllabus upon faculty approval.*
-> 8. *Finally, it compiles an official **Course File Dossier** with one click, providing an audit-ready printable document for accreditation panels.*
+> 8. *Finally, it compiles an official **Course File Course Handout** with one click, providing an audit-ready printable document for accreditation panels.*
 >
 > *Our system is backed by a robust automated test suite with 21 passing unit tests. Thank you, and I look forward to demonstrating the live application."*
 

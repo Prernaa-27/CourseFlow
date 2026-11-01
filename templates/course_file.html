@@ -1,22 +1,22 @@
 {% extends "base.html" %}
 
-{% block title %}Course File{% endblock %}
-{% block breadcrumb %}Course File{% endblock %}
+{% block title %}Course Handout{% endblock %}
+{% block breadcrumb %}Course Handout{% endblock %}
 
 {% block content %}
 <div id="courseFileRoot">
   <!-- Page Header -->
   <div class="page-header">
     <div>
-      <h2 class="page-title">Course File Generator</h2>
-      <p class="page-subtitle">Track the 8 essential course-file sections, verify completeness, and generate or preview the course dossier.</p>
+      <h2 class="page-title">Course Handout Generator</h2>
+      <p class="page-subtitle">Track the 8 essential course-file sections, verify completeness, and generate or preview the course handout.</p>
     </div>
     <div class="d-flex align-items-center gap-2 mt-3 mt-md-0">
       <a href="/course-file/preview?course_id=CS301" class="btn btn-outline-secondary btn-sm" id="viewPreviewBtn">
-        <i class="bi bi-eye me-1"></i> Preview Dossier
+        <i class="bi bi-eye me-1"></i> Preview Course Handout
       </a>
       <button class="btn btn-primary btn-sm d-flex align-items-center gap-2" id="generateDossierBtn">
-        <i class="bi bi-file-earmark-check"></i> Generate Course File
+        <i class="bi bi-file-earmark-check"></i> Generate Course Handout
       </button>
     </div>
   </div>
@@ -36,7 +36,7 @@
       </div>
 
       <div class="col-md-4 text-center border-start border-end">
-        <div class="text-muted small">Course File Status:</div>
+        <div class="text-muted small">Course Handout Status:</div>
         <div class="mt-1" id="cfStatusBadgeContainer">
           <span class="badge-status badge-status-inprogress"><i class="bi bi-hourglass-split"></i> In Progress</span>
         </div>
@@ -55,7 +55,7 @@
         </div>
         <div class="text-end mt-2">
           <button class="btn btn-sm btn-outline-primary py-0 px-2" style="font-size: 0.75rem;" id="markCompleteBtn">
-            <i class="bi bi-check-circle me-1"></i> Mark Dossier Complete
+            <i class="bi bi-check-circle me-1"></i> Mark Handout Complete
           </button>
         </div>
       </div>
@@ -74,7 +74,7 @@
       <!-- Populated by course_file.js -->
     </div>
     <div class="cf-card-footer d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2">
-      <span class="small text-muted"><i class="bi bi-shield-check me-1 text-success"></i>Complete the essential sections to finish your course file dossier.</span>
+      <span class="small text-muted"><i class="bi bi-shield-check me-1 text-success"></i>Complete the essential sections to finish your course handout.</span>
       <div class="d-flex gap-2">
         <button class="btn btn-sm btn-secondary" onclick="window.location.reload()"><i class="bi bi-arrow-clockwise me-1"></i>Reset Verification</button>
         <button class="btn btn-sm btn-primary" onclick="document.getElementById('generateDossierBtn').click()"><i class="bi bi-check-lg me-1"></i>Finalize & Generate</button>

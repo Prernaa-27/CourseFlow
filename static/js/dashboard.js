@@ -134,7 +134,7 @@ function renderCompletionChart(courses) {
         legend: { display: false },
         tooltip: {
           callbacks: {
-            label: (ctx) => `Course Dossier Readiness: ${ctx.parsed.y}%`
+            label: (ctx) => `Course Handout Readiness: ${ctx.parsed.y}%`
           }
         }
       },

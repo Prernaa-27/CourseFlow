@@ -283,7 +283,7 @@ async function initAdminMonitoringPage() {
         </td>
         <td>${CourseFlow.renderStatusBadge(c.status)}</td>
         <td class="text-end">
-          <a href="/course-file?course_id=${c.id}" class="btn btn-sm btn-outline-primary py-1 px-2" style="font-size:0.75rem;">Audit Dossier</a>
+          <a href="/course-file?course_id=${c.id}" class="btn btn-sm btn-outline-primary py-1 px-2" style="font-size:0.75rem;">Audit Handout</a>
         </td>
       </tr>
     `).join('');

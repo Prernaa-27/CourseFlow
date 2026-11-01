@@ -89,6 +89,9 @@ def test_m7_tc03_generate_summary_real_gemini_pdf(client):
         'courseId': 'CS301'
     }
     response = client.post('/api/handouts/summarize', data=data, content_type='multipart/form-data')
+    if response.status_code == 429:
+        import pytest
+        pytest.skip("External Gemini API rate limit / quota exceeded (HTTP 429)")
     assert response.status_code == 200
     res_json = response.get_json()
 
@@ -127,6 +130,9 @@ def test_m7_tc03_generate_summary_real_gemini_docx(client):
         'courseId': 'CS301'
     }
     response = client.post('/api/handouts/summarize', data=data, content_type='multipart/form-data')
+    if response.status_code == 429:
+        import pytest
+        pytest.skip("External Gemini API rate limit / quota exceeded (HTTP 429)")
     assert response.status_code == 200
     res_json = response.get_json()
 
