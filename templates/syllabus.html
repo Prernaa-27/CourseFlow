@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Syllabus Management{% endblock %}
+{% block title %}Syllabus{% endblock %}
 {% block breadcrumb %}Syllabus{% endblock %}
 
 {% block content %}
@@ -12,10 +12,7 @@
       <p class="page-subtitle">Configure course modules, topics, contact hours, and learning outcome alignment.</p>
     </div>
     <div class="d-flex align-items-center gap-2 mt-3 mt-md-0">
-      <button class="btn btn-outline-secondary btn-sm" id="markReviewedBtn">
-        <i class="bi bi-patch-check me-1"></i> Mark as Reviewed
-      </button>
-      <button class="btn btn-primary btn-sm d-flex align-items-center gap-2 shadow-xs" id="addUnitBtn">
+      <button class="btn btn-primary btn-sm d-flex align-items-center gap-2" id="addUnitBtn">
         <i class="bi bi-plus-lg"></i> Add Unit / Module
       </button>
     </div>
@@ -58,24 +55,6 @@
     </div>
   </div>
 
-  <!-- Document Upload Box (With transparent integration guidance) -->
-  <div class="cf-card p-3 mb-4 bg-light border-dashed">
-    <div class="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3">
-      <div class="d-flex align-items-center gap-3">
-        <i class="bi bi-file-earmark-arrow-up text-primary fs-3"></i>
-        <div>
-          <div class="fw-semibold text-dark small">Import Syllabus Document</div>
-          <div class="text-secondary small" style="font-size: 0.78rem;">Upload approved university syllabus (.docx or .pdf) to parse modules.</div>
-        </div>
-      </div>
-      <div>
-        <label for="syllabusFileInput" class="btn btn-sm btn-outline-primary mb-0 cursor-pointer">
-          <i class="bi bi-upload me-1"></i> Upload Handout
-        </label>
-        <input type="file" id="syllabusFileInput" class="d-none" accept=".pdf,.docx,.txt">
-      </div>
-    </div>
-  </div>
 
   <!-- Units List Container -->
   <div id="syllabusUnitsContainer">

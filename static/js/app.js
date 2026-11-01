@@ -390,8 +390,8 @@ const apiService = {
 
   async saveCourse(course) {
     if (this.useBackend) {
-      const method = course.id ? 'PUT' : 'POST';
-      const url = course.id ? `/api/courses/${course.id}` : '/api/courses';
+      const method = course.isEdit ? 'PUT' : 'POST';
+      const url = course.isEdit ? `/api/courses/${course.id}` : '/api/courses';
       const res = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
@@ -400,10 +400,15 @@ const apiService = {
       return await res.json();
     }
     const courses = db.data.courses;
-    const index = courses.findIndex(c => c.id === course.id);
-    if (index >= 0) {
-      courses[index] = { ...courses[index], ...course };
+    if (course.isEdit) {
+      const index = courses.findIndex(c => c.id === course.id);
+      if (index >= 0) {
+        courses[index] = { ...courses[index], ...course };
+      }
     } else {
+      if (courses.some(c => c.code.toUpperCase() === course.code.toUpperCase())) {
+        throw new Error(`Course code "${course.code}" already exists.`);
+      }
       if (!course.id) course.id = course.code;
       if (!course.completion) course.completion = 0;
       if (!course.status) course.status = 'Draft';
@@ -614,6 +619,18 @@ const apiService = {
   },
 
   async saveOutcomes(courseId, data) {
+    // M5-TC04: Restrict correlation values to the range 0-3
+    if (data && data.mapping) {
+      for (const co in data.mapping) {
+        for (const target in data.mapping[co]) {
+          const val = parseInt(data.mapping[co][target], 10);
+          if (isNaN(val) || val < 0 || val > 3) {
+            throw new Error(`Correlation level for ${co} -> ${target} must be between 0 and 3.`);
+          }
+          data.mapping[co][target] = val;
+        }
+      }
+    }
     db.data.outcomes[courseId] = data;
     db.save(db.data);
     return data;

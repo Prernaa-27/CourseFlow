@@ -20,7 +20,7 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
   <style>
     body {
-      background: linear-gradient(135deg, #EEF2FF 0%, #F8FAFC 100%);
+      background-color: var(--color-bg-main, #F4F5F7);
       min-height: 100vh;
       display: flex;
       align-items: center;
@@ -28,18 +28,18 @@
       padding: 1.5rem;
     }
     .login-container {
-      max-width: 960px;
+      max-width: 900px;
       width: 100%;
       background-color: #FFFFFF;
-      border-radius: var(--radius-xl);
-      border: 1px solid var(--color-border);
-      box-shadow: var(--shadow-xl);
+      border-radius: var(--radius-sm, 4px);
+      border: 1px solid var(--color-border, #E5E7EB);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
       overflow: hidden;
     }
     .brand-hero-side {
-      background: linear-gradient(145deg, #3730A3 0%, #4338CA 50%, #6366F1 100%);
+      background-color: #1A1D2E;
       color: #FFFFFF;
-      padding: 3rem 2.5rem;
+      padding: 3rem 2.25rem;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -54,28 +54,32 @@
     <div class="col-lg-5 brand-hero-side d-none d-lg-flex">
       <div>
         <div class="d-flex align-items-center gap-2 mb-4">
-          <div class="brand-icon" style="background:#FFFFFF; color:var(--color-primary);">
+          <div class="brand-icon" style="background:var(--color-accent, #2563EB); color:#FFFFFF;">
             <i class="bi bi-mortarboard-fill"></i>
           </div>
-          <span class="fs-4 fw-bold">CourseFlow</span>
+          <span class="fs-5 fw-bold text-white">CourseFlow</span>
         </div>
-        <h4 class="fw-bold mb-3" style="line-height:1.3;">University Course File Management System</h4>
+        <h4 class="fw-bold mb-3 text-white" style="line-height:1.3;">Course File Management System</h4>
         <p class="text-white-50 small mb-4">
-          A modern, audit-ready platform for university faculty and administrators to streamline syllabus planning, assessment tracking, OBE outcome attainment, and dossier generation.
+          A structured university academic records portal for syllabus planning, assessment tracking, outcome attainment, and course file compilation.
         </p>
 
-        <div class="d-flex flex-column gap-3">
-          <div class="d-flex align-items-center gap-3">
-            <i class="bi bi-shield-check fs-5 text-white"></i>
-            <span class="small">NBA Tier-1 & NAAC Criterion-2 Compliance</span>
+        <div class="d-flex flex-column gap-2">
+          <div class="d-flex align-items-center gap-2 text-white-50 small">
+            <i class="bi bi-check2 text-white"></i>
+            <span>Course & Syllabus Planning</span>
           </div>
-          <div class="d-flex align-items-center gap-3">
-            <i class="bi bi-diagram-3 fs-5 text-white"></i>
-            <span class="small">CO-PO/PSO Correlation & Analytics</span>
+          <div class="d-flex align-items-center gap-2 text-white-50 small">
+            <i class="bi bi-check2 text-white"></i>
+            <span>Assessment & Attendance Tracking</span>
           </div>
-          <div class="d-flex align-items-center gap-3">
-            <i class="bi bi-stars fs-5 text-white"></i>
-            <span class="small">AI-Assisted Syllabus Summarization</span>
+          <div class="d-flex align-items-center gap-2 text-white-50 small">
+            <i class="bi bi-check2 text-white"></i>
+            <span>CO-PO Mapping & Attainment</span>
+          </div>
+          <div class="d-flex align-items-center gap-2 text-white-50 small">
+            <i class="bi bi-check2 text-white"></i>
+            <span>8-Section Course File Dossier</span>
           </div>
         </div>
       </div>
@@ -88,8 +92,8 @@
     <!-- Right Login Form Side -->
     <div class="col-lg-7 p-4 p-md-5">
       <div class="mb-4">
-        <h3 class="fw-bold text-dark mb-1">Welcome back</h3>
-        <p class="text-muted small">Sign in to your university academic portal</p>
+        <h3 class="fw-bold text-dark mb-1">Sign In</h3>
+        <p class="text-muted small">Access your university CourseFlow account</p>
       </div>
 
       {% if error %}

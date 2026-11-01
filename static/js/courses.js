@@ -109,8 +109,16 @@ function setupCourseEventListeners() {
       const studentsCount = parseInt(document.getElementById('courseFormStudents').value, 10) || 50;
       const description = document.getElementById('courseFormDesc').value.trim();
 
+      // M2-TC03: Reject duplicate course code
+      const isDuplicate = allCourses.some(c => c.code.toUpperCase() === code && (!id || c.id !== id));
+      if (isDuplicate) {
+        CourseFlow.showToast(`Course code "${code}" already exists. Duplicate course codes are not allowed.`, 'danger', 'Duplicate Code');
+        return;
+      }
+
       const newCourse = {
         id: id || code,
+        isEdit: !!id,
         code,
         title,
         semester,
@@ -125,14 +133,18 @@ function setupCourseEventListeners() {
         department: 'Computer Science & Engineering'
       };
 
-      await CourseFlow.apiService.saveCourse(newCourse);
-      CourseFlow.showToast(id ? 'Course updated successfully' : 'Course created successfully', 'success');
+      try {
+        await CourseFlow.apiService.saveCourse(newCourse);
+        CourseFlow.showToast(id ? 'Course updated successfully' : 'Course created successfully', 'success');
 
-      const modalEl = document.getElementById('courseModal');
-      const modal = bootstrap.Modal.getInstance(modalEl);
-      if (modal) modal.hide();
+        const modalEl = document.getElementById('courseModal');
+        const modal = bootstrap.Modal.getInstance(modalEl);
+        if (modal) modal.hide();
 
-      await loadCourses();
+        await loadCourses();
+      } catch (err) {
+        CourseFlow.showToast(err.message || 'Error saving course', 'danger', 'Error');
+      }
     });
   }
 }

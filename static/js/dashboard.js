@@ -109,10 +109,10 @@ function renderCompletionChart(courses) {
   const labels = courses.map(c => c.code);
   const data = courses.map(c => c.completion);
   const backgroundColors = data.map(val => {
-    if (val === 100) return '#16A34A';
-    if (val >= 75) return '#4338CA';
-    if (val >= 50) return '#6366F1';
-    return '#F59E0B';
+    if (val === 100) return '#059669'; // Emerald / Complete
+    if (val >= 75) return '#2563EB';  // Institutional Blue
+    if (val >= 50) return '#3B82F6';
+    return '#D97706';                // Amber / In progress
   });
 
   new Chart(ctx, {
@@ -120,11 +120,11 @@ function renderCompletionChart(courses) {
     data: {
       labels: labels,
       datasets: [{
-        label: 'Completion %',
+        label: 'Readiness %',
         data: data,
         backgroundColor: backgroundColors,
-        borderRadius: 6,
-        maxBarThickness: 36
+        borderRadius: 4,
+        maxBarThickness: 28
       }]
     },
     options: {
@@ -134,7 +134,7 @@ function renderCompletionChart(courses) {
         legend: { display: false },
         tooltip: {
           callbacks: {
-            label: (ctx) => `Readiness: ${ctx.parsed.y}%`
+            label: (ctx) => `Course Dossier Readiness: ${ctx.parsed.y}%`
           }
         }
       },
@@ -143,7 +143,7 @@ function renderCompletionChart(courses) {
           min: 0,
           max: 100,
           ticks: { stepSize: 25, callback: v => v + '%' },
-          grid: { color: '#F1F5F9' }
+          grid: { color: '#E5E7EB' }
         },
         x: {
           grid: { display: false }

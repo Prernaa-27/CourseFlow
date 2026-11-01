@@ -43,17 +43,34 @@ async function initOutcomesMappingPage() {
     saveBtn.addEventListener('click', async () => {
       // Gather selects
       const selects = document.querySelectorAll('.matrix-select');
+      let hasInvalid = false;
       selects.forEach(sel => {
         const co = sel.dataset.co;
         const target = sel.dataset.target;
         const val = parseInt(sel.value, 10);
-        if (!currentOutcomesData.mapping[co]) currentOutcomesData.mapping[co] = {};
-        currentOutcomesData.mapping[co][target] = val;
+        // M5-TC04: Validate correlation level is 0, 1, 2, or 3
+        if (isNaN(val) || val < 0 || val > 3) {
+          hasInvalid = true;
+          sel.classList.add('is-invalid');
+        } else {
+          sel.classList.remove('is-invalid');
+          if (!currentOutcomesData.mapping[co]) currentOutcomesData.mapping[co] = {};
+          currentOutcomesData.mapping[co][target] = val;
+        }
       });
 
-      await CourseFlow.apiService.saveOutcomes(currentCourse, currentOutcomesData);
-      CourseFlow.showToast('CO-PO and PSO mapping matrix saved and verified successfully!', 'success');
-      updateCoverageMetrics();
+      if (hasInvalid) {
+        CourseFlow.showToast('Correlation values must be between 0 and 3 (0: None, 1: Low, 2: Moderate, 3: High).', 'danger', 'Validation Error');
+        return;
+      }
+
+      try {
+        await CourseFlow.apiService.saveOutcomes(currentCourse, currentOutcomesData);
+        CourseFlow.showToast('CO-PO and PSO mapping matrix saved and verified successfully!', 'success');
+        updateCoverageMetrics();
+      } catch (err) {
+        CourseFlow.showToast(err.message || 'Error saving outcomes', 'danger', 'Validation Error');
+      }
     });
   }
 

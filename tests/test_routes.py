@@ -28,6 +28,16 @@ def test_login_faculty_success(client):
     assert response.status_code == 200
     assert b"Good morning" in response.data
 
+def test_login_invalid_password_rejected(client):
+    # M1-TC04: Incorrect passwords must be rejected
+    response = client.post('/login', data={
+        'email': 'faculty@courseflow.demo',
+        'password': 'wrongpassword999'
+    }, follow_redirects=True)
+    assert response.status_code == 200
+    assert b"Invalid password" in response.data or b"Invalid credentials" in response.data
+    assert b"Sign In to CourseFlow" in response.data
+
 def test_login_admin_success(client):
     response = client.post('/login', data={
         'email': 'admin@courseflow.demo',
@@ -121,6 +131,11 @@ def test_api_endpoints(client):
     assert data_ai['success'] is True
     assert 'topicsIdentified' in data_ai
     assert len(data_ai['suggestedOutcomes']) > 0
+
+    # POST /api/courses duplicate code rejection (M2-TC03)
+    res_dup = client.post('/api/courses', json={'code': 'CS301', 'title': 'Duplicate Test'})
+    assert res_dup.status_code == 400
+    assert "already exists" in res_dup.get_json()['error']
 
     # POST /api/course-files/generate
     res_gen = client.post('/api/course-files/generate', json={'courseId': 'CS301'})

@@ -150,24 +150,31 @@ def login():
         email = request.form.get('email', '').strip().lower()
         password = request.form.get('password', '').strip()
 
-        # Demo authentication check
-        if email in DEMO_USERS and (password == 'courseflow123' or password != ''):
-            session['user'] = DEMO_USERS[email]
-            return redirect(url_for('dashboard'))
-        elif email != '':
-            # Allow custom demo faculty login
-            role = 'admin' if 'admin' in email else 'faculty'
-            user_data = {
-                "name": "Prof. " + email.split('@')[0].replace('.', ' ').title(),
-                "email": email,
-                "role": role,
-                "department": "Computer Science & Engineering",
-                "avatar": email[:2].upper()
-            }
-            session['user'] = user_data
-            return redirect(url_for('dashboard'))
-        else:
+        # Reject empty fields
+        if not email or not password:
             error = "Please enter valid demo credentials."
+        # Demo authentication check - strictly validate password
+        elif email in DEMO_USERS:
+            if password == 'courseflow123':
+                session['user'] = DEMO_USERS[email]
+                return redirect(url_for('dashboard'))
+            else:
+                error = "Invalid password. For demo access, use courseflow123."
+        else:
+            # Custom demo email login (must also use valid demo password)
+            if password == 'courseflow123':
+                role = 'admin' if 'admin' in email else 'faculty'
+                user_data = {
+                    "name": "Prof. " + email.split('@')[0].replace('.', ' ').title(),
+                    "email": email,
+                    "role": role,
+                    "department": "Computer Science & Engineering",
+                    "avatar": email[:2].upper()
+                }
+                session['user'] = user_data
+                return redirect(url_for('dashboard'))
+            else:
+                error = "Invalid credentials. Please enter valid demo credentials."
 
     return render_template('login.html', error=error)
 
@@ -324,6 +331,9 @@ def api_current_user():
 def api_courses():
     if request.method == 'POST':
         data = request.get_json() or {}
+        code = (data.get('code') or '').strip().upper()
+        if any(c['code'].upper() == code for c in DEMO_COURSES):
+            return jsonify({"error": f"Course code {code} already exists."}), 400
         DEMO_COURSES.append(data)
         return jsonify(data), 201
     return jsonify(DEMO_COURSES)

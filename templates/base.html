@@ -32,7 +32,7 @@
         </div>
         <div class="brand-text">
           <span class="brand-title">CourseFlow</span>
-          <span class="brand-subtitle">Course File System</span>
+          <span class="brand-subtitle">University System</span>
         </div>
       </a>
     </div>
@@ -42,72 +42,71 @@
       <div class="px-2 mb-3">
         <div class="demo-role-pill">
           <div>
-            <div class="text-muted" style="font-size:0.65rem; text-transform:uppercase; letter-spacing:0.05em;">Current Role</div>
-            <strong class="text-dark small text-capitalize">{{ user.role if user else 'faculty' }}</strong>
+            <div class="demo-role-label">System Role</div>
+            <strong class="demo-role-name text-capitalize">{{ user.role if user else 'faculty' }}</strong>
           </div>
-          <span class="badge {{ 'bg-primary' if user and user.role == 'admin' else 'bg-indigo text-primary bg-primary-subtle' }}">
+          <span class="badge {{ 'bg-primary' if user and user.role == 'admin' else 'bg-secondary-subtle text-dark border' }}" style="font-size: 0.68rem;">
             {{ 'Administrator' if user and user.role == 'admin' else 'Faculty' }}
           </span>
         </div>
       </div>
 
-      <div class="nav-section-title">Academic Modules</div>
+      <!-- OVERVIEW -->
+      <div class="nav-section-title">OVERVIEW</div>
       <a href="/dashboard" class="nav-link {{ 'active' if active_page == 'dashboard' else '' }}">
         <i class="bi bi-grid-1x2"></i> <span>Dashboard</span>
       </a>
+
+      <!-- COURSES -->
+      <div class="nav-section-title">COURSES</div>
       <a href="/courses" class="nav-link {{ 'active' if active_page == 'courses' or active_page == 'course_detail' else '' }}">
-        <i class="bi bi-collection"></i> <span>My Courses</span>
+        <i class="bi bi-book"></i> <span>Courses</span>
       </a>
       <a href="/syllabus" class="nav-link {{ 'active' if active_page == 'syllabus' else '' }}">
-        <i class="bi bi-journal-text"></i> <span>Syllabus Management</span>
+        <i class="bi bi-journal-text"></i> <span>Syllabus Planning</span>
       </a>
       <a href="/session-planner" class="nav-link {{ 'active' if active_page == 'session_planner' else '' }}">
-        <i class="bi bi-calendar3-week"></i> <span>Session Planner</span>
-      </a>
-      <a href="/students" class="nav-link {{ 'active' if active_page == 'students' else '' }}">
-        <i class="bi bi-people"></i> <span>Student Records</span>
-      </a>
-      <a href="/assessments" class="nav-link {{ 'active' if active_page == 'assessments' else '' }}">
-        <i class="bi bi-card-checklist"></i> <span>Assessments</span>
-      </a>
-      <a href="/marks" class="nav-link {{ 'active' if active_page == 'marks' else '' }}">
-        <i class="bi bi-pencil-square"></i> <span>Marks Entry</span>
-      </a>
-      <a href="/attendance" class="nav-link {{ 'active' if active_page == 'attendance' else '' }}">
-        <i class="bi bi-person-check"></i> <span>Attendance</span>
-      </a>
-      <a href="/feedback" class="nav-link {{ 'active' if active_page == 'feedback' else '' }}">
-        <i class="bi bi-chat-heart"></i> <span>Student Feedback</span>
+        <i class="bi bi-calendar3"></i> <span>Session Planner</span>
       </a>
 
-      <div class="nav-section-title">Outcomes & Accreditation</div>
+      <!-- ACADEMIC RECORDS -->
+      <div class="nav-section-title">ACADEMIC RECORDS</div>
+      <a href="/students" class="nav-link {{ 'active' if active_page == 'students' else '' }}">
+        <i class="bi bi-people"></i> <span>Students</span>
+      </a>
+      <a href="/marks" class="nav-link {{ 'active' if active_page == 'marks' else '' }}">
+        <i class="bi bi-pencil-square"></i> <span>Marks</span>
+      </a>
+      <a href="/attendance" class="nav-link {{ 'active' if active_page == 'attendance' else '' }}">
+        <i class="bi bi-check2-square"></i> <span>Attendance</span>
+      </a>
+      <a href="/feedback" class="nav-link {{ 'active' if active_page == 'feedback' else '' }}">
+        <i class="bi bi-chat-left-text"></i> <span>Feedback</span>
+      </a>
+
+      <!-- OUTCOMES -->
+      <div class="nav-section-title">OUTCOMES</div>
       <a href="/outcomes" class="nav-link {{ 'active' if active_page == 'outcomes' else '' }}">
         <i class="bi bi-diagram-3"></i> <span>CO-PO/PSO Mapping</span>
       </a>
       <a href="/attainment" class="nav-link {{ 'active' if active_page == 'attainment' else '' }}">
-        <i class="bi bi-graph-up-arrow"></i> <span>Attainment Analytics</span>
-      </a>
-      <a href="/ai-assistant" class="nav-link {{ 'active' if active_page == 'ai_assistant' else '' }}">
-        <i class="bi bi-stars text-primary"></i> <span>AI Handout Assistant</span>
-      </a>
-      <a href="/course-file" class="nav-link {{ 'active' if active_page == 'course_file' else '' }}">
-        <i class="bi bi-file-earmark-pdf"></i> <span>Course File Dossier</span>
+        <i class="bi bi-bar-chart-line"></i> <span>Attainment</span>
       </a>
 
-      <!-- Administration section visible for Administrator role -->
+      <!-- COURSE FILES -->
+      <div class="nav-section-title">COURSE FILES</div>
+      <a href="/ai-assistant" class="nav-link {{ 'active' if active_page == 'ai_assistant' else '' }}">
+        <i class="bi bi-file-earmark-text"></i> <span>Handout Summarizer</span>
+      </a>
+      <a href="/course-file" class="nav-link {{ 'active' if active_page == 'course_file' else '' }}">
+        <i class="bi bi-folder2-open"></i> <span>Course Dossier</span>
+      </a>
+
+      <!-- ADMINISTRATION (visible for Administrator) -->
       {% if user and user.role == 'admin' %}
-      <div class="nav-section-title text-primary">Administration</div>
+      <div class="nav-section-title">ADMINISTRATION</div>
       <a href="/admin/faculty" class="nav-link {{ 'active' if active_page == 'admin_faculty' else '' }}">
-        <i class="bi bi-person-gear"></i> <span>Faculty Management</span>
-      </a>
-      <a href="/admin/courses" class="nav-link {{ 'active' if active_page == 'admin_courses' else '' }}">
-        <i class="bi bi-folder-check"></i> <span>Course Management</span>
-      </a>
-      <a href="/admin/assignments" class="nav-link {{ 'active' if active_page == 'admin_assignments' else '' }}">
-        <i class="bi bi-arrow-left-right"></i> <span>Faculty Assignments</span>
-      </a>
-      <a href="/admin/monitoring" class="nav-link {{ 'active' if active_page == 'admin_monitoring' else '' }}">
-        <i class="bi bi-speedometer2"></i> <span>Completion Monitoring</span>
+        <i class="bi bi-person-badge"></i> <span>Faculty Management</span>
       </a>
       {% endif %}
     </div>
@@ -115,15 +114,15 @@
     <div class="sidebar-footer">
       <div class="d-flex align-items-center justify-content-between">
         <div class="d-flex align-items-center gap-2">
-          <div class="user-avatar-circle" style="width:30px; height:30px; font-size:0.75rem;">
+          <div class="user-avatar-circle" style="width:28px; height:28px; font-size:0.75rem; background-color: var(--color-accent);">
             {{ user.avatar if user else 'CF' }}
           </div>
-          <div style="line-height:1.1;">
-            <div class="fw-bold text-dark small" style="font-size:0.78rem;">{{ user.name if user else 'Demo User' }}</div>
-            <div class="text-muted" style="font-size:0.68rem;">{{ user.department if user else 'Dept of CSE' }}</div>
+          <div style="line-height:1.15;">
+            <div class="fw-semibold text-white small" style="font-size:0.78rem;">{{ user.name if user else 'Dr. Sarah Jenkins' }}</div>
+            <div style="color: var(--sidebar-text-muted); font-size:0.68rem;">{{ user.department if user else 'Dept of CSE' }}</div>
           </div>
         </div>
-        <a href="/logout" class="text-muted small hover-primary" title="Logout"><i class="bi bi-box-arrow-right fs-6"></i></a>
+        <a href="/logout" style="color: var(--sidebar-text-muted);" class="small hover-white" title="Logout"><i class="bi bi-box-arrow-right fs-6"></i></a>
       </div>
     </div>
   </aside>
@@ -155,21 +154,6 @@
           </select>
         </div>
 
-        <!-- Notifications Dropdown -->
-        <div class="dropdown">
-          <button class="topbar-action-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Notifications">
-            <i class="bi bi-bell"></i>
-            <span class="notification-badge" id="notificationBadgeCount" style="display:none;">3</span>
-          </button>
-          <div class="dropdown-menu dropdown-menu-end notifications-dropdown shadow-lg p-0" id="notificationsDropdownMenu">
-            <!-- Rendered by app.js -->
-          </div>
-        </div>
-
-        <!-- Help Info Modal Trigger -->
-        <button class="topbar-action-btn" type="button" data-bs-toggle="modal" data-bs-target="#helpInfoModal" title="System Documentation & Viva Guide">
-          <i class="bi bi-question-circle"></i>
-        </button>
 
         <!-- User Profile Dropdown -->
         <div class="dropdown">
@@ -195,8 +179,8 @@
                 <option value="admin" {{ 'selected' if user and user.role == 'admin' else '' }}>Administrator View</option>
               </select>
             </li>
-            <li><a class="dropdown-item small" href="/courses"><i class="bi bi-collection me-2"></i>My Courses</a></li>
-            <li><a class="dropdown-item small" href="/course-file"><i class="bi bi-file-earmark-check me-2"></i>Course Files</a></li>
+            <li><a class="dropdown-item small" href="/courses"><i class="bi bi-book me-2"></i>Courses</a></li>
+            <li><a class="dropdown-item small" href="/course-file"><i class="bi bi-folder2-open me-2"></i>Course File</a></li>
             <li><hr class="dropdown-divider"></li>
             <li><a class="dropdown-item small text-danger" href="/logout"><i class="bi bi-box-arrow-right me-2"></i>Sign Out</a></li>
           </ul>
