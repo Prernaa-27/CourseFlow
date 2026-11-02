@@ -167,6 +167,17 @@ function renderMappingMatrix() {
 
 window.updateCellColor = function(select) {
   select.setAttribute('value', select.value);
+  const co = select.dataset.co;
+  const target = select.dataset.target;
+  const val = parseInt(select.value, 10) || 0;
+  if (currentOutcomesData && currentOutcomesData.mapping) {
+    if (!currentOutcomesData.mapping[co]) currentOutcomesData.mapping[co] = {};
+    currentOutcomesData.mapping[co][target] = val;
+    // Auto-save immediately to store so changes reflect across pages even before clicking Save button
+    const courseSelect = document.getElementById('outcomesCourseSelect');
+    const courseId = courseSelect ? courseSelect.value : 'CS301';
+    CourseFlow.apiService.saveOutcomes(courseId, currentOutcomesData);
+  }
 };
 
 window.removeCO = function(coCode) {
@@ -220,8 +231,8 @@ async function initAttainmentPage() {
   async function load() {
     const attainment = await CourseFlow.apiService.getAttainment(currentCourse);
     const outcomesData = await CourseFlow.apiService.getOutcomes(currentCourse);
-    renderAttainmentView(attainment, outcomesData);
-    renderAttainmentMatrix(outcomesData);
+    const calculatedPoData = renderAttainmentView(attainment, outcomesData);
+    renderAttainmentMatrix(outcomesData, calculatedPoData);
   }
 
   if (courseSelect) {
@@ -317,7 +328,8 @@ function renderAttainmentView(attainment, outcomesData) {
   }
 
   // Charts
-  renderAttainmentCharts(attainment, outcomesData);
+  const poData = renderAttainmentCharts(attainment, outcomesData);
+  return poData;
 }
 
 function renderAttainmentCharts(attainment, outcomesData) {
@@ -365,45 +377,49 @@ function renderAttainmentCharts(attainment, outcomesData) {
   }
 
   // 2. Program Outcome PO / PSO Attainment Bar Chart (Dynamically computed from CO-PO Mapping Matrix)
+  let poData = {};
+  const defaultPo = {
+    PO1: 2.7, PO2: 2.5, PO3: 2.8, PO4: 2.2, PO5: 2.6,
+    PO6: 2.1, PO7: 2.0, PO8: 2.4, PO9: 2.5, PO10: 2.7,
+    PO11: 2.3, PO12: 2.6, PSO1: 2.8, PSO2: 2.5
+  };
+
+  if (outcomesData && outcomesData.mapping && outcomes.length > 0) {
+    const coScores = {};
+    outcomes.forEach(o => {
+      coScores[o.code] = o.achieved !== undefined ? o.achieved : (o.internal || 75);
+    });
+
+    const allTargets = [...PO_LIST, ...PSO_LIST];
+    allTargets.forEach(target => {
+      let mappedCoCount = 0;
+      let totalContribution = 0;
+      Object.keys(outcomesData.mapping).forEach(coCode => {
+        const weight = outcomesData.mapping[coCode][target] || 0;
+        if (weight > 0) {
+          mappedCoCount++;
+          const scorePct = coScores[coCode] !== undefined ? coScores[coCode] : 75;
+          // NBA OBE formula: Contribution of CO to PO = (CO Achieved % / 100) * Correlation Level
+          totalContribution += (scorePct / 100) * weight;
+        }
+      });
+
+      if (mappedCoCount > 0) {
+        // Average attainment contribution across mapped COs on 0-3 scale
+        poData[target] = parseFloat((totalContribution / mappedCoCount).toFixed(2));
+      } else {
+        // If no CO is mapped to this PO, attainment is 0.0
+        poData[target] = 0.0;
+      }
+    });
+  } else {
+    poData = attainment.poAttainment || defaultPo;
+  }
+
   const ctx2 = document.getElementById('poAttainmentChart');
   if (ctx2 && typeof Chart !== 'undefined') {
     if (poAttainmentChartInstance) {
       poAttainmentChartInstance.destroy();
-    }
-    const defaultPo = {
-      PO1: 2.7, PO2: 2.5, PO3: 2.8, PO4: 2.2, PO5: 2.6,
-      PO6: 2.1, PO7: 2.0, PO8: 2.4, PO9: 2.5, PO10: 2.7,
-      PO11: 2.3, PO12: 2.6, PSO1: 2.8, PSO2: 2.5
-    };
-
-    let poData = {};
-    if (outcomesData && outcomesData.mapping && outcomes.length > 0) {
-      const coScores = {};
-      outcomes.forEach(o => {
-        coScores[o.code] = o.achieved !== undefined ? o.achieved : (o.internal || 75);
-      });
-
-      const allTargets = [...PO_LIST, ...PSO_LIST];
-      allTargets.forEach(target => {
-        let weightSum = 0;
-        let weightedScore = 0;
-        Object.keys(outcomesData.mapping).forEach(coCode => {
-          const weight = outcomesData.mapping[coCode][target] || 0;
-          if (weight > 0) {
-            weightSum += weight;
-            const score = coScores[coCode] !== undefined ? coScores[coCode] : 75;
-            weightedScore += (score / 100) * weight;
-          }
-        });
-        if (weightSum > 0) {
-          // Weighted achievement scaled to 3.0
-          poData[target] = parseFloat(((weightedScore / weightSum) * 3.0).toFixed(1));
-        } else {
-          poData[target] = (attainment.poAttainment && attainment.poAttainment[target]) || defaultPo[target] || 0.0;
-        }
-      });
-    } else {
-      poData = attainment.poAttainment || defaultPo;
     }
 
     const keys = Object.keys(poData);
@@ -416,7 +432,7 @@ function renderAttainmentCharts(attainment, outcomesData) {
         datasets: [{
           label: 'Attainment Level (Out of 3.0)',
           data: vals,
-          backgroundColor: '#6366F1',
+          backgroundColor: vals.map(v => v >= 2.0 ? '#4338CA' : v >= 1.0 ? '#6366F1' : v > 0 ? '#F59E0B' : '#E2E8F0'),
           borderRadius: 4
         }]
       },
@@ -424,7 +440,12 @@ function renderAttainmentCharts(attainment, outcomesData) {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
-          legend: { display: false }
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: (ctx) => `Attainment: ${ctx.parsed.y > 0 ? ctx.parsed.y + ' / 3.0' : '0.0 (Unmapped)'}`
+            }
+          }
         },
         scales: {
           y: { min: 0, max: 3.0, ticks: { stepSize: 0.5 } }
@@ -432,13 +453,14 @@ function renderAttainmentCharts(attainment, outcomesData) {
       }
     });
   }
+  return poData;
 }
 
 
 // ==========================================================================
 // 3. ATTAINMENT PAGE CO-PO / PSO MATRIX RENDERER
 // ==========================================================================
-function renderAttainmentMatrix(outcomesData) {
+function renderAttainmentMatrix(outcomesData, poData) {
   const table = document.getElementById('attainmentMatrixTable');
   if (!table || !outcomesData || !outcomesData.cos) return;
 
@@ -472,4 +494,20 @@ function renderAttainmentMatrix(outcomesData) {
     row += '</tr>';
     return row;
   }).join('');
+
+  // Add Table Footer showing calculated PO Attainment Score matching the bar chart
+  let tfoot = table.querySelector('tfoot');
+  if (!tfoot) {
+    tfoot = document.createElement('tfoot');
+    table.appendChild(tfoot);
+  }
+  let tfootHtml = '<tr class="table-light fw-bold">' +
+    '<td class="text-start text-primary"><i class="bi bi-graph-up-arrow me-1"></i>PO Attainment (out of 3.0)</td>';
+  [...PO_LIST, ...PSO_LIST].forEach(target => {
+    const val = (poData && poData[target] !== undefined) ? poData[target] : 0.0;
+    const colorClass = val >= 2.0 ? 'text-primary' : val >= 1.0 ? 'text-indigo' : val > 0 ? 'text-warning' : 'text-muted';
+    tfootHtml += `<td class="${colorClass} fw-bold">${val > 0 ? val.toFixed(1) : '-'}</td>`;
+  });
+  tfootHtml += '</tr>';
+  tfoot.innerHTML = tfootHtml;
 }
