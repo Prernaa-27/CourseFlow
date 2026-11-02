@@ -219,7 +219,9 @@ async function initAttainmentPage() {
 
   async function load() {
     const attainment = await CourseFlow.apiService.getAttainment(currentCourse);
-    renderAttainmentView(attainment);
+    const outcomesData = await CourseFlow.apiService.getOutcomes(currentCourse);
+    renderAttainmentView(attainment, outcomesData);
+    renderAttainmentMatrix(outcomesData);
   }
 
   if (courseSelect) {
@@ -235,7 +237,7 @@ async function initAttainmentPage() {
 let attainmentCompareChartInstance = null;
 let poAttainmentChartInstance = null;
 
-function renderAttainmentView(attainment) {
+function renderAttainmentView(attainment, outcomesData) {
   if (!attainment) return;
 
   // Stat summary - calculate overall average safely
@@ -315,10 +317,10 @@ function renderAttainmentView(attainment) {
   }
 
   // Charts
-  renderAttainmentCharts(attainment);
+  renderAttainmentCharts(attainment, outcomesData);
 }
 
-function renderAttainmentCharts(attainment) {
+function renderAttainmentCharts(attainment, outcomesData) {
   const outcomes = attainment.outcomes || [];
   if (outcomes.length === 0) return;
 
@@ -362,7 +364,7 @@ function renderAttainmentCharts(attainment) {
     });
   }
 
-  // 2. Program Outcome PO / PSO Attainment Bar Chart
+  // 2. Program Outcome PO / PSO Attainment Bar Chart (Dynamically computed from CO-PO Mapping Matrix)
   const ctx2 = document.getElementById('poAttainmentChart');
   if (ctx2 && typeof Chart !== 'undefined') {
     if (poAttainmentChartInstance) {
@@ -373,7 +375,37 @@ function renderAttainmentCharts(attainment) {
       PO6: 2.1, PO7: 2.0, PO8: 2.4, PO9: 2.5, PO10: 2.7,
       PO11: 2.3, PO12: 2.6, PSO1: 2.8, PSO2: 2.5
     };
-    const poData = attainment.poAttainment || defaultPo;
+
+    let poData = {};
+    if (outcomesData && outcomesData.mapping && outcomes.length > 0) {
+      const coScores = {};
+      outcomes.forEach(o => {
+        coScores[o.code] = o.achieved !== undefined ? o.achieved : (o.internal || 75);
+      });
+
+      const allTargets = [...PO_LIST, ...PSO_LIST];
+      allTargets.forEach(target => {
+        let weightSum = 0;
+        let weightedScore = 0;
+        Object.keys(outcomesData.mapping).forEach(coCode => {
+          const weight = outcomesData.mapping[coCode][target] || 0;
+          if (weight > 0) {
+            weightSum += weight;
+            const score = coScores[coCode] !== undefined ? coScores[coCode] : 75;
+            weightedScore += (score / 100) * weight;
+          }
+        });
+        if (weightSum > 0) {
+          // Weighted achievement scaled to 3.0
+          poData[target] = parseFloat(((weightedScore / weightSum) * 3.0).toFixed(1));
+        } else {
+          poData[target] = (attainment.poAttainment && attainment.poAttainment[target]) || defaultPo[target] || 0.0;
+        }
+      });
+    } else {
+      poData = attainment.poAttainment || defaultPo;
+    }
+
     const keys = Object.keys(poData);
     const vals = Object.values(poData);
 
@@ -400,4 +432,44 @@ function renderAttainmentCharts(attainment) {
       }
     });
   }
+}
+
+
+// ==========================================================================
+// 3. ATTAINMENT PAGE CO-PO / PSO MATRIX RENDERER
+// ==========================================================================
+function renderAttainmentMatrix(outcomesData) {
+  const table = document.getElementById('attainmentMatrixTable');
+  if (!table || !outcomesData || !outcomesData.cos) return;
+
+  const thead = table.querySelector('thead');
+  const tbody = document.getElementById('attainmentMatrixTbody');
+  if (!thead || !tbody) return;
+
+  let theadHtml = '<tr><th class="text-start" style="min-width: 140px;">Course Outcome</th>';
+  PO_LIST.forEach(po => theadHtml += '<th>' + po + '</th>');
+  PSO_LIST.forEach(pso => theadHtml += '<th class="bg-primary-subtle text-primary">' + pso + '</th>');
+  theadHtml += '</tr>';
+  thead.innerHTML = theadHtml;
+
+  const mapping = outcomesData.mapping || {};
+  tbody.innerHTML = outcomesData.cos.map(co => {
+    const m = mapping[co.code] || {};
+    let row = '<tr>' +
+      '<td class="text-start">' +
+        '<span class="badge bg-primary-subtle text-primary fw-bold me-1">' + co.code + '</span>' +
+        '<span class="small text-secondary">' + (co.text ? (co.text.length > 40 ? co.text.substring(0, 40) + '...' : co.text) : '') + '</span>' +
+      '</td>';
+    [...PO_LIST, ...PSO_LIST].forEach(target => {
+      const val = (m[target] !== undefined) ? m[target] : 0;
+      let badgeHtml = '<span class="text-muted">-</span>';
+      if (val === 3) badgeHtml = '<span class="badge bg-primary text-white">3</span>';
+      else if (val === 2) badgeHtml = '<span class="badge bg-primary-subtle text-primary border border-primary-subtle">2</span>';
+      else if (val === 1) badgeHtml = '<span class="badge bg-light text-dark border">1</span>';
+
+      row += '<td>' + badgeHtml + '</td>';
+    });
+    row += '</tr>';
+    return row;
+  }).join('');
 }

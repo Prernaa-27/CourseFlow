@@ -128,6 +128,36 @@
       </div>
     </div>
   </div>
+
+  <!-- CO-PO & PSO Articulation Matrix (Active Mappings) -->
+  <div class="cf-card mb-4">
+    <div class="cf-card-header d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2">
+      <div>
+        <h6 class="cf-card-title mb-0">
+          <i class="bi bi-diagram-3 text-primary me-2"></i> CO-PO &amp; PSO Articulation Matrix (Active Mappings)
+        </h6>
+        <span class="small text-muted">Correlations mapped on a 1–3 scale (1: Low, 2: Moderate, 3: High, -: No Correlation)</span>
+      </div>
+      <a href="/outcomes" class="btn btn-sm btn-outline-primary">
+        <i class="bi bi-pencil-square me-1"></i> Edit Mappings
+      </a>
+    </div>
+    <div class="cf-table-wrapper">
+      <table class="cf-table text-center" id="attainmentMatrixTable">
+        <thead>
+          <!-- Dynamically populated by analytics.js -->
+        </thead>
+        <tbody id="attainmentMatrixTbody">
+          <!-- Dynamically populated by analytics.js -->
+        </tbody>
+      </table>
+    </div>
+    <div class="cf-card-footer">
+      <div class="small text-muted">
+        <strong>Dynamic Attainment Projection:</strong> Updates saved in <a href="/outcomes" class="fw-semibold">CO-PO Mapping</a> automatically update this matrix and recompute the PO/PSO Attainment Level bar chart above.
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}
 
