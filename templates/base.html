@@ -172,13 +172,6 @@
               <div class="fw-semibold text-dark small">{{ user.name if user else 'Mr. XYZ' }}</div>
               <div class="text-muted small" style="font-size:0.75rem;">{{ user.email if user else 'faculty@courseflow.demo' }}</div>
             </li>
-            <li class="p-2 border-bottom">
-              <div class="small fw-semibold text-muted px-2 mb-1" style="font-size:0.7rem; text-transform:uppercase;">Demo Role Switcher:</div>
-              <select class="form-select form-select-sm demo-role-switcher">
-                <option value="faculty" {{ 'selected' if not user or user.role == 'faculty' else '' }}>Faculty View</option>
-                <option value="admin" {{ 'selected' if user and user.role == 'admin' else '' }}>Administrator View</option>
-              </select>
-            </li>
             <li><a class="dropdown-item small" href="/courses"><i class="bi bi-book me-2"></i>Courses</a></li>
             <li><a class="dropdown-item small" href="/course-file"><i class="bi bi-folder2-open me-2"></i>Course File</a></li>
             <li><hr class="dropdown-divider"></li>
@@ -221,8 +214,7 @@
         <h6 class="fw-bold text-primary mb-2 mt-3">3. Software Engineering Viva Demonstration Tips</h6>
         <div class="p-3 rounded bg-light border small text-dark">
           <div class="mb-1"><strong>Demo Faculty Login:</strong> <code>faculty@courseflow.demo</code> &bull; Pass: <code>courseflow123</code></div>
-          <div class="mb-1"><strong>Demo Admin Login:</strong> <code>admin@courseflow.demo</code> &bull; Pass: <code>courseflow123</code></div>
-          <div><strong>Fast Role Toggle:</strong> Use the profile dropdown in the top-right corner to toggle between Faculty and Administrator perspectives without logging out!</div>
+          <div><strong>Demo Admin Login:</strong> <code>admin@courseflow.demo</code> &bull; Pass: <code>courseflow123</code></div>
         </div>
       </div>
       <div class="modal-footer border-top bg-light">
