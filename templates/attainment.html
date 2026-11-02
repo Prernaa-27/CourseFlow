@@ -18,15 +18,6 @@
     </div>
   </div>
 
-  <!-- Transparent Demonstration Data Banner -->
-  <div class="alert alert-info border-info-subtle d-flex align-items-start gap-3 mb-4">
-    <i class="bi bi-info-circle-fill text-primary fs-4 mt-1"></i>
-    <div class="small">
-      <strong>Sample Demonstration Data:</strong>
-      These figures demonstrate how attainment is calculated from assessment marks and compared against course benchmarks. During evaluation, these sample records demonstrate dynamic chart rendering and threshold alerting.
-    </div>
-  </div>
-
   <!-- Course Selector & Overall Score -->
   <div class="row g-3 mb-4">
     <div class="col-md-5">
@@ -106,12 +97,9 @@
       <table class="cf-table">
         <thead>
           <tr>
-            <th>Outcome</th>
+            <th>Course Outcome</th>
             <th class="text-center">Target Benchmark</th>
-            <th class="text-center">Internal CIE %</th>
-            <th class="text-center">External SEE %</th>
-            <th class="text-center">Indirect Survey %</th>
-            <th class="text-center">Final Attainment</th>
+            <th class="text-center">Class Average Score</th>
             <th class="text-center">Difference</th>
             <th>Status</th>
           </tr>
@@ -124,7 +112,7 @@
     <div class="cf-card-footer">
       <div class="small text-muted">
         <strong>Attainment Calculation:</strong>
-        <code>Final Attainment % = (0.30 &times; Internal CIE) + (0.50 &times; External SEE) + (0.20 &times; Student Feedback)</code>.
+        Class Average Score % is computed directly from student assessment marks mapped to each Course Outcome. Outcomes achieving &ge; 70% meet the target benchmark.
       </div>
     </div>
   </div>
@@ -162,5 +150,5 @@
 {% endblock %}
 
 {% block scripts %}
-<script src="{{ url_for('static', filename='js/analytics.js') }}?v=4.2"></script>
+<script src="{{ url_for('static', filename='js/analytics.js') }}?v=4.3"></script>
 {% endblock %}

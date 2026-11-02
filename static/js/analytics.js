@@ -268,23 +268,18 @@ function renderAttainmentView(attainment, outcomesData) {
   const tbody = document.getElementById('attainmentTableTbody');
   if (tbody) {
     if (outcomes.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="8" class="text-center text-muted py-4">No attainment records available for this course.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted py-4">No attainment records available for this course.</td></tr>`;
     } else {
       tbody.innerHTML = outcomes.map(o => {
         const meetsTarget = o.status === 'Meets Target' || (o.achieved >= o.target);
         const statusText = o.status || (meetsTarget ? 'Meets Target' : 'Below Target');
-        const diffText = o.diff || (o.achieved >= o.target ? `+${(o.achieved - o.target).toFixed(1)}%` : `${(o.achieved - o.target).toFixed(1)}%`);
-        const internalVal = o.internal !== undefined ? `${o.internal}%` : '--';
-        const externalVal = o.external !== undefined ? `${o.external}%` : '--';
-        const indirectVal = o.indirect !== undefined ? `${o.indirect}%` : '--';
+        const diffNum = (o.achieved - o.target).toFixed(1);
+        const diffText = diffNum >= 0 ? `+${diffNum}%` : `${diffNum}%`;
 
         return `
           <tr>
             <td class="fw-bold text-dark">${o.code}</td>
             <td class="text-center">${o.target}%</td>
-            <td class="text-center text-muted">${internalVal}</td>
-            <td class="text-center text-muted">${externalVal}</td>
-            <td class="text-center text-muted">${indirectVal}</td>
             <td class="text-center fw-bold text-dark">${o.achieved}%</td>
             <td class="text-center fw-semibold ${meetsTarget ? 'text-success' : 'text-danger'}">
               ${diffText}
@@ -356,7 +351,7 @@ function renderAttainmentCharts(attainment, outcomesData) {
             borderRadius: 4
           },
           {
-            label: 'Achieved Direct & Indirect (%)',
+            label: 'Class Average Score (%)',
             data: outcomes.map(o => o.achieved),
             backgroundColor: outcomes.map(o => (o.status === 'Meets Target' || o.achieved >= o.target) ? '#4338CA' : '#DC2626'),
             borderRadius: 4
