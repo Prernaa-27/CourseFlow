@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+
+{% block title %}Software Requirements & MoSCoW Prioritization - CourseFlow{% endblock %}
+{% block breadcrumb %}Software Engineering / Requirements & SRS{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-0">
+  <!-- Header -->
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 pb-2 border-bottom">
+    <div>
+      <div class="d-flex align-items-center gap-2 mb-1">
+        <span class="badge bg-primary-subtle text-primary fw-bold px-2 py-1">CSE3005 Capstone</span>
+        <span class="badge bg-light text-dark border">IEEE 830 Specification</span>
+      </div>
+      <h4 class="fw-bold text-dark mb-1">Software Requirements Specification (SRS) & MoSCoW Prioritization</h4>
+      <p class="text-secondary small mb-0">Systematic requirement elicitation, stakeholder categorization, acceptance criteria, and agile triage.</p>
+    </div>
+    <div class="d-flex align-items-center gap-2 mt-3 mt-md-0">
+      <button onclick="window.print()" class="btn btn-outline-secondary btn-sm d-flex align-items-center gap-1">
+        <i class="bi bi-printer"></i> Print SRS Document
+      </button>
+    </div>
+  </div>
+
+  <!-- MoSCoW Summary Cards -->
+  <div class="row g-3 mb-4">
+    <div class="col-md-3">
+      <a href="/requirements?moscow=Must+Have" class="text-decoration-none">
+        <div class="cf-card p-3 border-start border-4 border-danger h-100 hover-shadow transition">
+          <div class="d-flex justify-content-between align-items-center mb-1">
+            <span class="badge bg-danger-subtle text-danger fw-bold">MUST HAVE</span>
+            <i class="bi bi-exclamation-octagon-fill text-danger"></i>
+          </div>
+          <div class="fs-3 fw-bold text-dark">{{ counts.must }}</div>
+          <div class="small text-muted" style="font-size:0.75rem;">Non-negotiable core functionality</div>
+        </div>
+      </a>
+    </div>
+    <div class="col-md-3">
+      <a href="/requirements?moscow=Should+Have" class="text-decoration-none">
+        <div class="cf-card p-3 border-start border-4 border-warning h-100 hover-shadow transition">
+          <div class="d-flex justify-content-between align-items-center mb-1">
+            <span class="badge bg-warning-subtle text-warning-emphasis fw-bold">SHOULD HAVE</span>
+            <i class="bi bi-star-fill text-warning"></i>
+          </div>
+          <div class="fs-3 fw-bold text-dark">{{ counts.should }}</div>
+          <div class="small text-muted" style="font-size:0.75rem;">High-value essential features</div>
+        </div>
+      </a>
+    </div>
+    <div class="col-md-3">
+      <a href="/requirements?moscow=Could+Have" class="text-decoration-none">
+        <div class="cf-card p-3 border-start border-4 border-info h-100 hover-shadow transition">
+          <div class="d-flex justify-content-between align-items-center mb-1">
+            <span class="badge bg-info-subtle text-info fw-bold">COULD HAVE</span>
+            <i class="bi bi-plus-circle-fill text-info"></i>
+          </div>
+          <div class="fs-3 fw-bold text-dark">{{ counts.could }}</div>
+          <div class="small text-muted" style="font-size:0.75rem;">Desirable enhancements if time permits</div>
+        </div>
+      </a>
+    </div>
+    <div class="col-md-3">
+      <a href="/requirements?moscow=Won%27t+Have" class="text-decoration-none">
+        <div class="cf-card p-3 border-start border-4 border-secondary h-100 hover-shadow transition">
+          <div class="d-flex justify-content-between align-items-center mb-1">
+            <span class="badge bg-secondary-subtle text-secondary fw-bold">WON'T HAVE</span>
+            <i class="bi bi-slash-circle text-secondary"></i>
+          </div>
+          <div class="fs-3 fw-bold text-dark">{{ counts.wont }}</div>
+          <div class="small text-muted" style="font-size:0.75rem;">Explicitly out of scope for current release</div>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <!-- Filter Pills -->
+  <div class="d-flex align-items-center gap-2 mb-3">
+    <span class="small fw-semibold text-muted">Filter Priority:</span>
+    <a href="/requirements" class="btn btn-sm {{ 'btn-primary' if not current_filter else 'btn-outline-secondary' }} px-3 py-1" style="font-size:0.78rem;">All ({{ counts.total }})</a>
+    <a href="/requirements?moscow=Must+Have" class="btn btn-sm {{ 'btn-danger' if current_filter == 'Must Have' else 'btn-outline-danger' }} px-3 py-1" style="font-size:0.78rem;">Must Have</a>
+    <a href="/requirements?moscow=Should+Have" class="btn btn-sm {{ 'btn-warning' if current_filter == 'Should Have' else 'btn-outline-warning' }} px-3 py-1" style="font-size:0.78rem;">Should Have</a>
+    <a href="/requirements?moscow=Could+Have" class="btn btn-sm {{ 'btn-info' if current_filter == 'Could Have' else 'btn-outline-info' }} px-3 py-1" style="font-size:0.78rem;">Could Have</a>
+    <a href="/requirements?moscow=Won%27t+Have" class="btn btn-sm {{ 'btn-secondary' if current_filter == 'Won\'t Have' else 'btn-outline-secondary' }} px-3 py-1" style="font-size:0.78rem;">Won't Have</a>
+  </div>
+
+  <!-- Requirements Table -->
+  <div class="cf-card mb-4">
+    <div class="cf-card-header d-flex justify-content-between align-items-center">
+      <h6 class="cf-card-title mb-0">
+        <i class="bi bi-card-checklist text-primary me-2"></i> Software Engineering Requirements Catalog
+      </h6>
+      <span class="small text-muted">Showing {{ requirements | length }} requirement specifications</span>
+    </div>
+    <div class="cf-card-body p-0">
+      <div class="cf-table-wrapper">
+        <table class="cf-table">
+          <thead>
+            <tr>
+              <th style="width: 100px;">Req ID</th>
+              <th>Requirement Title & Description</th>
+              <th style="width: 140px;">Category</th>
+              <th style="width: 130px;">MoSCoW</th>
+              <th style="width: 130px;">Status</th>
+              <th>Stakeholder</th>
+              <th>Acceptance Criteria</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for req in requirements %}
+            <tr>
+              <td>
+                <span class="badge {{ 'bg-primary-subtle text-primary' if 'FR' in req.req_id else 'bg-secondary-subtle text-dark' }} fw-bold">
+                  {{ req.req_id }}
+                </span>
+              </td>
+              <td>
+                <div class="fw-semibold text-dark">{{ req.title }}</div>
+                <div class="text-secondary small mt-1" style="font-size:0.8rem; line-height:1.4;">{{ req.description }}</div>
+              </td>
+              <td>
+                <span class="badge bg-light text-dark border">{{ req.category }}</span>
+              </td>
+              <td>
+                {% if req.moscow == 'Must Have' %}
+                <span class="badge bg-danger-subtle text-danger fw-bold"><i class="bi bi-shield-fill-check me-1"></i>Must</span>
+                {% elif req.moscow == 'Should Have' %}
+                <span class="badge bg-warning-subtle text-warning-emphasis fw-bold"><i class="bi bi-star-fill me-1"></i>Should</span>
+                {% elif req.moscow == 'Could Have' %}
+                <span class="badge bg-info-subtle text-info fw-bold"><i class="bi bi-plus me-1"></i>Could</span>
+                {% else %}
+                <span class="badge bg-secondary-subtle text-secondary fw-bold">Won't</span>
+                {% endif %}
+              </td>
+              <td>
+                <span class="badge {{ 'bg-success-subtle text-success' if req.status == 'Implemented' else 'bg-warning-subtle text-warning' }}">
+                  {{ req.status }}
+                </span>
+              </td>
+              <td class="small text-secondary">{{ req.stakeholder }}</td>
+              <td class="small text-muted font-monospace" style="font-size:0.75rem;">{{ req.acceptance_criteria or 'Satisfied' }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- IEEE 830 System Constraints & Assumptions -->
+  <div class="row g-3">
+    <div class="col-md-6">
+      <div class="cf-card p-4 h-100">
+        <h6 class="fw-bold text-dark mb-3"><i class="bi bi-shield-lock-fill text-primary me-2"></i>System Constraints</h6>
+        <ul class="text-secondary small mb-0" style="line-height:1.7;">
+          <li><strong>Relational Persistence:</strong> Hosted PostgreSQL (Supabase) mandatory for zero localStorage data leakage.</li>
+          <li><strong>Role Isolation:</strong> Faculty and Administrator permissions verified at controller layer via decorators.</li>
+          <li><strong>Browser Compatibility:</strong> Responsive layout targeting modern ECMAScript 2022+ standards.</li>
+          <li><strong>Security:</strong> CSRF tokens, hashed bcrypt passwords, and parametrized SQL injection defenses.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="cf-card p-4 h-100">
+        <h6 class="fw-bold text-dark mb-3"><i class="bi bi-info-circle-fill text-primary me-2"></i>Assumptions & Dependencies</h6>
+        <ul class="text-secondary small mb-0" style="line-height:1.7;">
+          <li><strong>Academic Accreditation:</strong> Conforms strictly to NBA Tier-1 and NAAC Criterion 2.6 guidelines.</li>
+          <li><strong>AI API Availability:</strong> External Google Gemini 2.5 Flash API requires active credentials in <code>.env</code>.</li>
+          <li><strong>Data Integrity:</strong> Strict boundary isolating demo student evaluation from real university archives.</li>
+          <li><strong>Viva Defense:</strong> All architectural patterns (MVC, Repository, Factory) explainable by student authors.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

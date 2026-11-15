@@ -26,11 +26,8 @@
           <div class="d-flex align-items-center gap-3">
             <label for="syllabusCourseSelect" class="small fw-semibold text-muted mb-0">Course:</label>
             <select id="syllabusCourseSelect" class="form-select form-select-sm" style="min-width: 200px;">
-              <option value="CS301" selected>CS301 - Software Engineering</option>
-              <option value="CS302">CS302 - Database Management Systems</option>
-              <option value="CS303">CS303 - Design & Analysis of Algorithms</option>
-              <option value="CS401">CS401 - Cloud Computing & DevOps</option>
-              <option value="CS202">CS202 - Object-Oriented Programming (Java)</option>
+              <option value="CSE2724" {{ 'selected' if course.code == 'CSE2724' else '' }}>CSE2724 - Human Computer Interaction (Primary)</option>
+              <option value="CSE3005" {{ 'selected' if course.code == 'CSE3005' else '' }}>CSE3005 - Software Engineering (Secondary)</option>
             </select>
           </div>
           <div class="d-flex align-items-center gap-2">

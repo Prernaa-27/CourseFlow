@@ -33,10 +33,8 @@
       <div class="col-md-5">
         <label for="aiCourseSelect" class="small text-muted fw-semibold mb-1">Target Course for Syllabus Integration:</label>
         <select id="aiCourseSelect" class="form-select form-select-sm">
-          <option value="CS301" selected>CS301 - Software Engineering</option>
-          <option value="CS302">CS302 - Database Management Systems</option>
-          <option value="CS303">CS303 - Design & Analysis of Algorithms</option>
-          <option value="CS401">CS401 - Cloud Computing & DevOps</option>
+          <option value="CSE2724" {{ 'selected' if course and course.code == 'CSE2724' else '' }}>CSE2724 - Human Computer Interaction (Primary)</option>
+          <option value="CSE3005" {{ 'selected' if course and course.code == 'CSE3005' else '' }}>CSE3005 - Software Engineering (Secondary)</option>
         </select>
       </div>
       <div class="col-md-7 text-md-end pt-md-3">
@@ -75,7 +73,7 @@
     </div>
 
     <!-- Selected File Preview Bar (Hidden initially) -->
-    <div id="fileSelectionCard" class="p-3 border rounded-3 mt-3 bg-light d-flex align-items-center justify-content-between" style="display: none !important;">
+    <div id="fileSelectionCard" class="p-3 border rounded-3 mt-3 bg-light align-items-center justify-content-between d-none">
       <div class="d-flex align-items-center gap-3">
         <i class="bi bi-file-earmark-text-fill fs-3 text-primary" id="selectedFileIcon"></i>
         <div>
@@ -84,7 +82,9 @@
         </div>
       </div>
       <div class="d-flex align-items-center gap-2">
-        <button type="button" class="btn btn-sm btn-outline-danger" id="removeFileBtn"><i class="bi bi-trash"></i> Remove</button>
+        <button type="button" class="btn btn-sm btn-outline-danger" id="removeFileBtn" onclick="removeSelectedHandoutFile(event)">
+          <i class="bi bi-trash me-1"></i> Remove
+        </button>
       </div>
     </div>
 
@@ -171,5 +171,5 @@
 {% endblock %}
 
 {% block scripts %}
-<script src="{{ url_for('static', filename='js/ai_assistant.js') }}"></script>
+<script src="{{ url_for('static', filename='js/ai_assistant.js') }}?v=4.2"></script>
 {% endblock %}

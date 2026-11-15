@@ -1,0 +1,221 @@
+{% extends "base.html" %}
+
+{% block title %}Software Project Management (SPM) - CourseFlow{% endblock %}
+{% block breadcrumb %}Software Engineering / Project Management{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-0">
+  <!-- Header -->
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 pb-2 border-bottom">
+    <div>
+      <div class="d-flex align-items-center gap-2 mb-1">
+        <span class="badge bg-primary-subtle text-primary fw-bold px-2 py-1">CSE3005 Module 5</span>
+        <span class="badge bg-light text-dark border">Agile SPM & Estimation</span>
+      </div>
+      <h4 class="fw-bold text-dark mb-1">Software Project Management Dashboard (SPM)</h4>
+      <p class="text-secondary small mb-0">Milestone tracking, Agile task board, Risk register, Critical Path Method (CPM), and PERT 3-point estimation.</p>
+    </div>
+    <div class="d-flex align-items-center gap-2 mt-3 mt-md-0">
+      <button onclick="window.print()" class="btn btn-outline-secondary btn-sm d-flex align-items-center gap-1">
+        <i class="bi bi-printer"></i> Export SPM Report
+      </button>
+    </div>
+  </div>
+
+  <!-- Milestone Progress Timeline -->
+  <div class="cf-card p-4 mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h6 class="cf-card-title mb-0"><i class="bi bi-flag-fill text-primary me-2"></i>Project Milestones & Sprint Roadmap</h6>
+      <span class="small text-muted">Overall Sprint Completion: <strong>{{ task_stats.completionRate }}%</strong></span>
+    </div>
+    <div class="row g-3">
+      {% for m in milestones %}
+      <div class="col-md">
+        <div class="p-3 rounded border bg-light h-100">
+          <div class="d-flex justify-content-between align-items-center mb-1">
+            <span class="badge {{ 'bg-success' if m.status == 'Completed' else 'bg-primary' }} text-white" style="font-size:0.7rem;">
+              {{ m.status }}
+            </span>
+            <span class="small fw-bold text-dark">{{ m.completion_percent }}%</span>
+          </div>
+          <div class="fw-bold text-dark small mt-1">{{ m.title }}</div>
+          <div class="text-secondary small mt-1" style="font-size:0.75rem;"><i class="bi bi-calendar-event me-1"></i>Due: {{ m.due_date }}</div>
+          <div class="cf-progress mt-2" style="height: 4px;">
+            <div class="cf-progress-bar {{ 'cf-progress-bar-success' if m.completion_percent == 100 else 'cf-progress-bar-indigo' }}" style="width: {{ m.completion_percent }}%"></div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Agile Task Board (Kanban Columns) -->
+  <div class="mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h6 class="fw-bold text-dark mb-0"><i class="bi bi-kanban text-secondary me-2"></i>Sprint Task Board</h6>
+      <span class="small text-muted">{{ task_stats.total }} total tracked tasks</span>
+    </div>
+    <div class="row g-3">
+      <!-- TO DO -->
+      <div class="col-md-3">
+        <div class="cf-card p-3 bg-light h-100 border">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <span class="fw-bold text-secondary small text-uppercase">To Do</span>
+            <span class="badge bg-secondary-subtle text-dark">{{ task_stats.todo }}</span>
+          </div>
+          <div class="d-flex flex-column gap-2">
+            {% for t in tasks if t.status == 'To Do' %}
+            <div class="bg-white p-3 rounded border shadow-2xs">
+              <div class="d-flex justify-content-between align-items-start mb-1">
+                <span class="badge {{ 'bg-danger-subtle text-danger' if t.priority == 'High' else 'bg-warning-subtle text-warning-emphasis' }}" style="font-size:0.65rem;">{{ t.priority }}</span>
+                <span class="small text-muted" style="font-size:0.7rem;">{{ t.estimated_hours }}h</span>
+              </div>
+              <div class="fw-semibold text-dark small">{{ t.title }}</div>
+              <div class="small text-secondary mt-2" style="font-size:0.72rem;"><i class="bi bi-person me-1"></i>{{ t.assignee }}</div>
+            </div>
+            {% else %}
+            <div class="text-center py-3 text-muted small">No tasks in backlog</div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+
+      <!-- IN PROGRESS -->
+      <div class="col-md-3">
+        <div class="cf-card p-3 bg-light h-100 border">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <span class="fw-bold text-primary small text-uppercase">In Progress</span>
+            <span class="badge bg-primary-subtle text-primary">{{ task_stats.inProgress }}</span>
+          </div>
+          <div class="d-flex flex-column gap-2">
+            {% for t in tasks if t.status == 'In Progress' %}
+            <div class="bg-white p-3 rounded border border-primary-subtle shadow-2xs">
+              <div class="d-flex justify-content-between align-items-start mb-1">
+                <span class="badge bg-primary-subtle text-primary" style="font-size:0.65rem;">{{ t.priority }}</span>
+                <span class="small text-muted" style="font-size:0.7rem;">{{ t.actual_hours }}/{{ t.estimated_hours }}h</span>
+              </div>
+              <div class="fw-semibold text-dark small">{{ t.title }}</div>
+              <div class="small text-secondary mt-2" style="font-size:0.72rem;"><i class="bi bi-person me-1"></i>{{ t.assignee }}</div>
+            </div>
+            {% else %}
+            <div class="text-center py-3 text-muted small">No tasks in progress</div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+
+      <!-- REVIEW -->
+      <div class="col-md-3">
+        <div class="cf-card p-3 bg-light h-100 border">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <span class="fw-bold text-warning-emphasis small text-uppercase">Review</span>
+            <span class="badge bg-warning-subtle text-warning-emphasis">0</span>
+          </div>
+          <div class="d-flex flex-column gap-2">
+            <div class="text-center py-3 text-muted small">All reviews completed</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DONE -->
+      <div class="col-md-3">
+        <div class="cf-card p-3 bg-light h-100 border">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <span class="fw-bold text-success small text-uppercase">Done</span>
+            <span class="badge bg-success-subtle text-success">{{ task_stats.done }}</span>
+          </div>
+          <div class="d-flex flex-column gap-2">
+            {% for t in tasks if t.status == 'Done' %}
+            <div class="bg-white p-3 rounded border shadow-2xs">
+              <div class="d-flex justify-content-between align-items-start mb-1">
+                <span class="badge bg-success-subtle text-success" style="font-size:0.65rem;"><i class="bi bi-check-lg me-1"></i>Completed</span>
+                <span class="small text-muted" style="font-size:0.7rem;">{{ t.actual_hours }}h</span>
+              </div>
+              <div class="fw-semibold text-dark small text-decoration-line-through text-muted">{{ t.title }}</div>
+              <div class="small text-secondary mt-2" style="font-size:0.72rem;"><i class="bi bi-person me-1"></i>{{ t.assignee }}</div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CPM & PERT 3-Point Estimation Section -->
+  <div class="row g-4 mb-4">
+    <div class="col-lg-7">
+      <div class="cf-card p-4 h-100">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <div>
+            <h6 class="cf-card-title mb-0"><i class="bi bi-calculator text-primary me-2"></i>PERT 3-Point Time Estimation & CPM</h6>
+            <div class="small text-muted" style="font-size:0.75rem;">Formula: Expected Duration \(T_E = \frac{a + 4m + b}{6}\) &bull; Variance \(\sigma^2 = (\frac{b-a}{6})^2\)</div>
+          </div>
+          <span class="badge bg-primary text-white px-2 py-1">Critical Path: {{ cpm_days }} Days</span>
+        </div>
+        <div class="cf-table-wrapper">
+          <table class="cf-table">
+            <thead>
+              <tr>
+                <th>Task Name</th>
+                <th class="text-center">Optimistic (a)</th>
+                <th class="text-center">Most Likely (m)</th>
+                <th class="text-center">Pessimistic (b)</th>
+                <th class="text-center">Expected (\(T_E\))</th>
+                <th class="text-center">Variance (\(\sigma^2\))</th>
+                <th class="text-center">Critical Path</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for p in perts %}
+              <tr>
+                <td class="fw-semibold text-dark small">{{ p.task_name }}</td>
+                <td class="text-center small">{{ p.optimistic_days }}d</td>
+                <td class="text-center small">{{ p.most_likely_days }}d</td>
+                <td class="text-center small">{{ p.pessimistic_days }}d</td>
+                <td class="text-center small fw-bold text-primary">{{ p.expected_days }}d</td>
+                <td class="text-center small text-muted">{{ p.variance }}</td>
+                <td class="text-center">
+                  {% if p.is_critical_path %}
+                  <span class="badge bg-danger text-white"><i class="bi bi-check-circle me-1"></i>Critical</span>
+                  {% else %}
+                  <span class="badge bg-light text-muted border">Float / Slack</span>
+                  {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Risk Register -->
+    <div class="col-lg-5">
+      <div class="cf-card p-4 h-100">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h6 class="cf-card-title mb-0"><i class="bi bi-shield-exclamation text-warning me-2"></i>Software Risk Register</h6>
+          <span class="badge bg-light text-dark border">{{ risks | length }} Risks Tracked</span>
+        </div>
+        <div class="d-flex flex-column gap-3">
+          {% for r in risks %}
+          <div class="p-3 rounded border bg-light">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+              <span class="badge bg-light text-dark border font-monospace">{{ r.risk_id }}</span>
+              <div>
+                <span class="badge bg-warning-subtle text-warning-emphasis me-1" style="font-size:0.65rem;">Prob: {{ r.probability }}</span>
+                <span class="badge bg-danger-subtle text-danger" style="font-size:0.65rem;">Impact: {{ r.impact }}</span>
+                <span class="badge bg-success-subtle text-success ms-1" style="font-size:0.65rem;">{{ r.status }}</span>
+              </div>
+            </div>
+            <div class="fw-semibold text-dark small mt-1">{{ r.description }}</div>
+            <div class="text-secondary small mt-2" style="font-size:0.75rem;">
+              <strong>Mitigation:</strong> {{ r.mitigation_strategy }}
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

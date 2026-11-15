@@ -3,6 +3,34 @@
  * Powered by Google Gemini API
  */
 
+// Global helper for remove button
+window.removeSelectedHandoutFile = function(e) {
+  if (e) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+  const fileInput = document.getElementById('handoutFileInput');
+  if (fileInput) fileInput.value = '';
+  const fileCard = document.getElementById('fileSelectionCard');
+  if (fileCard) {
+    fileCard.classList.remove('d-flex');
+    fileCard.classList.add('d-none');
+    fileCard.style.display = 'none';
+  }
+  const processBtn = document.getElementById('startSummarizeBtn');
+  if (processBtn) processBtn.disabled = true;
+  const progressBox = document.getElementById('aiProcessingProgress');
+  if (progressBox) progressBox.style.display = 'none';
+  const resultsBox = document.getElementById('aiResultContainer');
+  if (resultsBox) {
+    resultsBox.style.display = 'none';
+    resultsBox.classList.add('d-none');
+  }
+  if (typeof CourseFlow !== 'undefined' && CourseFlow.showToast) {
+    CourseFlow.showToast('Selected file removed.', 'info', 'File Cleared');
+  }
+};
+
 document.addEventListener('DOMContentLoaded', () => {
   if (!document.getElementById('aiAssistantRoot')) return;
 
@@ -79,7 +107,12 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
-    document.getElementById('fileSelectionCard').style.display = 'flex';
+    const fileCard = document.getElementById('fileSelectionCard');
+    if (fileCard) {
+      fileCard.classList.remove('d-none');
+      fileCard.classList.add('d-flex');
+      fileCard.style.removeProperty('display');
+    }
     if (processBtn) processBtn.disabled = false;
   }
 
@@ -131,15 +164,41 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Remove file button
+  function resetSelectedFile() {
+    selectedFile = null;
+    lastAnalysisResult = null;
+    if (fileInput) fileInput.value = '';
+    const fileCard = document.getElementById('fileSelectionCard');
+    if (fileCard) {
+      fileCard.classList.remove('d-flex');
+      fileCard.classList.add('d-none');
+      fileCard.style.display = 'none';
+    }
+    if (processBtn) processBtn.disabled = true;
+    if (progressBox) progressBox.style.display = 'none';
+    if (resultsBox) {
+      resultsBox.style.display = 'none';
+      resultsBox.classList.add('d-none');
+    }
+    if (typeof CourseFlow !== 'undefined' && CourseFlow.showToast) {
+      CourseFlow.showToast('Selected file removed.', 'info', 'File Cleared');
+    }
+  }
+
+  window.removeSelectedHandoutFile = function(e) {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    resetSelectedFile();
+  };
+
   const removeFileBtn = document.getElementById('removeFileBtn');
   if (removeFileBtn) {
-    removeFileBtn.addEventListener('click', () => {
-      selectedFile = null;
-      lastAnalysisResult = null;
-      if (fileInput) fileInput.value = '';
-      document.getElementById('fileSelectionCard').style.display = 'none';
-      if (processBtn) processBtn.disabled = true;
-      if (resultsBox) resultsBox.style.display = 'none';
+    removeFileBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      resetSelectedFile();
     });
   }
 

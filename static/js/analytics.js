@@ -21,7 +21,7 @@ let currentOutcomesData = null;
 
 async function initOutcomesMappingPage() {
   const courseSelect = document.getElementById('outcomesCourseSelect');
-  let currentCourse = courseSelect ? courseSelect.value : 'CS301';
+  let currentCourse = courseSelect ? courseSelect.value : (localStorage.getItem('cf_selected_course') || 'CSE2724');
 
   async function load() {
     currentOutcomesData = await CourseFlow.apiService.getOutcomes(currentCourse);
@@ -226,7 +226,7 @@ function updateCoverageMetrics() {
 // ==========================================================================
 async function initAttainmentPage() {
   const courseSelect = document.getElementById('attainmentCourseSelect');
-  let currentCourse = courseSelect ? courseSelect.value : 'CS301';
+  let currentCourse = courseSelect ? courseSelect.value : (localStorage.getItem('cf_selected_course') || 'CSE2724');
 
   async function load() {
     const attainment = await CourseFlow.apiService.getAttainment(currentCourse);
@@ -373,11 +373,6 @@ function renderAttainmentCharts(attainment, outcomesData) {
 
   // 2. Program Outcome PO / PSO Attainment Bar Chart (Dynamically computed from CO-PO Mapping Matrix)
   let poData = {};
-  const defaultPo = {
-    PO1: 2.7, PO2: 2.5, PO3: 2.8, PO4: 2.2, PO5: 2.6,
-    PO6: 2.1, PO7: 2.0, PO8: 2.4, PO9: 2.5, PO10: 2.7,
-    PO11: 2.3, PO12: 2.6, PSO1: 2.8, PSO2: 2.5
-  };
 
   if (outcomesData && outcomesData.mapping && outcomes.length > 0) {
     const coScores = {};
@@ -387,28 +382,28 @@ function renderAttainmentCharts(attainment, outcomesData) {
 
     const allTargets = [...PO_LIST, ...PSO_LIST];
     allTargets.forEach(target => {
-      let mappedCoCount = 0;
+      let sumCorrelation = 0;
       let totalContribution = 0;
       Object.keys(outcomesData.mapping).forEach(coCode => {
-        const weight = outcomesData.mapping[coCode][target] || 0;
-        if (weight > 0) {
-          mappedCoCount++;
-          const scorePct = coScores[coCode] !== undefined ? coScores[coCode] : 75;
-          // NBA OBE formula: Contribution of CO to PO = (CO Achieved % / 100) * Correlation Level
-          totalContribution += (scorePct / 100) * weight;
+        const corr = outcomesData.mapping[coCode][target] || 0;
+        if (corr > 0) {
+          sumCorrelation += corr;
+          // University OBE formula: PO Attainment = SUMPRODUCT(CO_Attainment, Correlation) / SUM(Correlation)
+          // Scaling 100% score to 3.0 scale: (scorePct / 100 * 3.0) * corr
+          const scoreOn3Scale = (coScores[coCode] !== undefined ? coScores[coCode] : 75) / 100.0 * 3.0;
+          totalContribution += scoreOn3Scale * corr;
         }
       });
 
-      if (mappedCoCount > 0) {
-        // Average attainment contribution across mapped COs on 0-3 scale
-        poData[target] = parseFloat((totalContribution / mappedCoCount).toFixed(2));
+      if (sumCorrelation > 0) {
+        poData[target] = parseFloat((totalContribution / sumCorrelation).toFixed(2));
       } else {
-        // If no CO is mapped to this PO, attainment is 0.0
-        poData[target] = 0.0;
+        // Unmapped PO: explicitly omitted from chart to prevent empty mini-line artifacts
+        poData[target] = null;
       }
     });
-  } else {
-    poData = attainment.poAttainment || defaultPo;
+  } else if (attainment.poAttainment) {
+    poData = attainment.poAttainment;
   }
 
   const ctx2 = document.getElementById('poAttainmentChart');
@@ -417,17 +412,18 @@ function renderAttainmentCharts(attainment, outcomesData) {
       poAttainmentChartInstance.destroy();
     }
 
-    const keys = Object.keys(poData);
-    const vals = Object.values(poData);
+    // Filter to strictly mapped POs only: completely removes 0-value mini-lines
+    const mappedLabels = Object.keys(poData).filter(k => poData[k] !== null && poData[k] !== undefined && poData[k] > 0);
+    const mappedVals = mappedLabels.map(k => poData[k]);
 
     poAttainmentChartInstance = new Chart(ctx2, {
       type: 'bar',
       data: {
-        labels: keys,
+        labels: mappedLabels,
         datasets: [{
           label: 'Attainment Level (Out of 3.0)',
-          data: vals,
-          backgroundColor: vals.map(v => v >= 2.0 ? '#4338CA' : v >= 1.0 ? '#6366F1' : v > 0 ? '#F59E0B' : '#E2E8F0'),
+          data: mappedVals,
+          backgroundColor: mappedVals.map(v => v >= 2.0 ? '#4338CA' : v >= 1.0 ? '#6366F1' : '#F59E0B'),
           borderRadius: 4
         }]
       },
@@ -438,7 +434,7 @@ function renderAttainmentCharts(attainment, outcomesData) {
           legend: { display: false },
           tooltip: {
             callbacks: {
-              label: (ctx) => `Attainment: ${ctx.parsed.y > 0 ? ctx.parsed.y + ' / 3.0' : '0.0 (Unmapped)'}`
+              label: (ctx) => `Attainment: ${ctx.parsed.y} / 3.0`
             }
           }
         },

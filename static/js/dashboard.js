@@ -69,8 +69,9 @@ async function renderAdminDashboard(courses, faculty) {
 }
 
 async function renderFacultyDashboard(courses) {
-  const sessionPlans = await CourseFlow.apiService.getSessionPlans('CS301');
-  const attainment = await CourseFlow.apiService.getAttainment('CS301');
+  const primaryCourseId = 'CSE2724';
+  const sessionPlans = await CourseFlow.apiService.getSessionPlans(primaryCourseId);
+  const attainment = await CourseFlow.apiService.getAttainment(primaryCourseId);
 
   // Compute live statistics from store
   const totalAssigned = courses.length;

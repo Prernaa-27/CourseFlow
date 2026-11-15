@@ -12,6 +12,9 @@
       <p class="page-subtitle">Manage enrolled students, section assignments, and academic identifiers.</p>
     </div>
     <div class="d-flex align-items-center gap-2 mt-3 mt-md-0">
+      <button class="btn btn-outline-success btn-sm d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#excelImportModal">
+        <i class="bi bi-file-earmark-excel"></i> Import from Excel
+      </button>
       <button class="btn btn-primary btn-sm d-flex align-items-center gap-2" onclick="openStudentModal()">
         <i class="bi bi-person-plus-fill"></i> Enroll Student
       </button>
@@ -30,11 +33,9 @@
 
       <div class="col-md-4">
         <select id="studentCourseFilter" class="form-select form-select-sm">
+          <option value="CSE2724" {{ 'selected' if course.code == 'CSE2724' else '' }}>CSE2724 - Human Computer Interaction (391 Students)</option>
+          <option value="CSE3005" {{ 'selected' if course.code == 'CSE3005' else '' }}>CSE3005 - Software Engineering (58 Students)</option>
           <option value="">All Courses</option>
-          <option value="CS301" selected>CS301 - Software Engineering</option>
-          <option value="CS302">CS302 - Database Management Systems</option>
-          <option value="CS303">CS303 - Design & Analysis of Algorithms</option>
-          <option value="CS401">CS401 - Cloud Computing & DevOps</option>
         </select>
       </div>
 
@@ -44,10 +45,16 @@
     </div>
   </div>
 
-  <!-- Synthetic Data Note -->
+  <!-- Data Provenance Note -->
   <div class="alert alert-info py-2 px-3 small border-info-subtle mb-3 d-flex align-items-center gap-2">
     <i class="bi bi-shield-check text-info fs-5"></i>
-    <span><strong>Synthetic Data Notice:</strong> All student names, university roll numbers, and contact details are synthetic demonstration data generated for academic evaluation.</span>
+    <span>
+      {% if course and course.code == 'CSE2724' %}
+      <strong>Authentic University Records:</strong> 391 enrolled students verified against official <code>CSE2724.xlsx</code> (Batch 2022, Semester 5, BML Munjal University).
+      {% else %}
+      <strong>Course Enrolment Roster:</strong> Student directory and section assignments for course evaluation.
+      {% endif %}
+    </span>
   </div>
 
   <!-- Students Table -->
@@ -104,10 +111,8 @@
             <div class="col-md-8">
               <label for="studentCourseField" class="form-label small fw-semibold text-dark">Assigned Course</label>
               <select class="form-select form-select-sm" id="studentCourseField">
-                <option value="CS301">CS301 - Software Engineering</option>
-                <option value="CS302">CS302 - Database Management Systems</option>
-                <option value="CS303">CS303 - Design & Analysis of Algorithms</option>
-                <option value="CS401">CS401 - Cloud Computing & DevOps</option>
+                <option value="CSE2724">CSE2724 - Human Computer Interaction</option>
+                <option value="CSE3005">CSE3005 - Software Engineering</option>
               </select>
             </div>
 
@@ -128,9 +133,115 @@
       </form>
     </div>
   </div>
+  <!-- Excel Import Modal -->
+  <div class="modal fade" id="excelImportModal" tabindex="-1" aria-labelledby="excelImportModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content" style="border-radius: var(--radius-lg);">
+        <div class="modal-header border-bottom">
+          <h5 class="modal-title fw-bold text-dark d-flex align-items-center gap-2" id="excelImportModalLabel">
+            <i class="bi bi-file-earmark-excel text-success"></i> Genuine Excel Data Import Engine
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4">
+          <!-- Step 1: Upload File -->
+          <div class="mb-4">
+            <label class="form-label fw-semibold text-dark small">1. Select Maitri ERP / OBE Spreadsheet (.xlsx):</label>
+            <input type="file" class="form-control form-control-sm" id="excelImportFileInput" accept=".xlsx,.xls">
+            <div class="form-text small">Upload an authentic institutional workbook such as <code>CSE2724.xlsx</code>.</div>
+          </div>
+
+          <div id="excelInspectSpinner" class="text-center py-3 d-none">
+            <div class="spinner-border text-primary spinner-border-sm me-2" role="status"></div>
+            <span class="small text-muted">Reading worksheets, inspecting headers & checking data types...</span>
+          </div>
+
+          <!-- Step 2: Select Sheet & Header Row -->
+          <div id="excelStepSheetSelect" class="mb-4 d-none p-3 bg-light rounded border">
+            <div class="row g-3">
+              <div class="col-md-7">
+                <label class="form-label fw-semibold small mb-1">2. Target Worksheet:</label>
+                <select id="excelSheetSelect" class="form-select form-select-sm"></select>
+              </div>
+              <div class="col-md-5">
+                <label class="form-label fw-semibold small mb-1">Header Row #:</label>
+                <input type="number" class="form-control form-control-sm" id="excelHeaderRowInput" value="10" min="1" max="50">
+              </div>
+            </div>
+          </div>
+
+          <div id="excelPreviewSpinner" class="text-center py-3 d-none">
+            <div class="spinner-border text-primary spinner-border-sm me-2" role="status"></div>
+            <span class="small text-muted">Generating column mapping & parsing preview rows...</span>
+          </div>
+
+          <!-- Step 3: Column Mapping & Preview -->
+          <div id="excelPreviewContainer" class="d-none">
+            <h6 class="fw-bold text-dark small mb-2 border-bottom pb-1">3. Map Spreadsheet Columns to Database Entities:</h6>
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label class="small text-muted fw-semibold mb-1">Student Roll No Column:</label>
+                <select id="mapColRoll" class="form-select form-select-sm"></select>
+              </div>
+              <div class="col-md-6">
+                <label class="small text-muted fw-semibold mb-1">Student Name Column:</label>
+                <select id="mapColName" class="form-select form-select-sm"></select>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="small text-muted fw-semibold mb-1">Assessment Marks Mapping:</label>
+              <div class="row g-2" id="mapColAssessmentsContainer">
+                <!-- Dynamically filled with course assessments -->
+              </div>
+            </div>
+
+            <div class="form-check form-switch mb-3">
+              <input class="form-check-input" type="checkbox" id="excelOverwriteCheckbox">
+              <label class="form-check-label small" for="excelOverwriteCheckbox">
+                Update existing student marks if already enrolled (Overwrite mode)
+              </label>
+            </div>
+
+            <h6 class="fw-bold text-dark small mb-2">Sample Data Preview (First 5 Rows):</h6>
+            <div class="table-responsive border rounded mb-3" style="max-height: 200px;">
+              <table class="table table-sm table-striped table-hover mb-0" style="font-size:0.75rem;">
+                <thead class="table-light" id="excelPreviewThead"></thead>
+                <tbody id="excelPreviewTbody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Step 4: Import Summary & Errors -->
+          <div id="excelImportResultContainer" class="d-none">
+            <div class="alert alert-success border-success-subtle mb-3">
+              <h6 class="fw-bold text-success mb-2 d-flex align-items-center gap-2">
+                <i class="bi bi-check-circle-fill"></i> Database Transaction Completed!
+              </h6>
+              <div class="d-flex gap-4 small">
+                <span>Successfully Imported: <strong id="summaryImportedCount" class="text-success fs-6">0</strong></span>
+                <span>Skipped (Duplicates): <strong id="summarySkippedCount" class="text-warning fs-6">0</strong></span>
+                <span>Rejected (Invalid): <strong id="summaryRejectedCount" class="text-danger fs-6">0</strong></span>
+              </div>
+            </div>
+            <button id="downloadErrorReportBtn" class="btn btn-outline-danger btn-sm d-none">
+              <i class="bi bi-download me-1"></i> Download Import Error Report (CSV)
+            </button>
+          </div>
+        </div>
+        <div class="modal-footer border-top">
+          <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-sm btn-success" id="executeImportBtn" disabled>
+            <i class="bi bi-cloud-arrow-up me-1"></i> Confirm & Import to Database
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}
 
 {% block scripts %}
 <script src="{{ url_for('static', filename='js/records.js') }}"></script>
+<script src="{{ url_for('static', filename='js/excel_import.js') }}"></script>
 {% endblock %}

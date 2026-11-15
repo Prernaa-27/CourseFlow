@@ -27,9 +27,8 @@
       <div class="cf-card p-3 mb-0">
         <label for="outcomesCourseSelect" class="small text-muted fw-semibold mb-1">Course:</label>
         <select id="outcomesCourseSelect" class="form-select form-select-sm">
-          <option value="CS301" selected>CS301 - Software Engineering</option>
-          <option value="CS302">CS302 - Database Management Systems</option>
-          <option value="CS303">CS303 - Design & Analysis of Algorithms</option>
+          <option value="CSE2724" {{ 'selected' if course.code == 'CSE2724' else '' }}>CSE2724 - Human Computer Interaction (Primary)</option>
+          <option value="CSE3005" {{ 'selected' if course.code == 'CSE3005' else '' }}>CSE3005 - Software Engineering (Secondary)</option>
         </select>
       </div>
     </div>

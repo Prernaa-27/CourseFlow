@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 // ==========================================================================
 async function initSyllabusPage() {
   const courseSelect = document.getElementById('syllabusCourseSelect');
-  let currentCourse = courseSelect ? courseSelect.value : 'CS301';
+  let currentCourse = courseSelect ? courseSelect.value : (localStorage.getItem('cf_selected_course') || 'CSE2724');
 
   async function loadUnits() {
     const units = await CourseFlow.apiService.getSyllabus(currentCourse);
@@ -176,7 +176,7 @@ let currentSessions = [];
 
 async function initSessionPlannerPage() {
   const courseSelect = document.getElementById('sessionCourseSelect');
-  let currentCourse = courseSelect ? courseSelect.value : 'CS301';
+  let currentCourse = courseSelect ? courseSelect.value : (localStorage.getItem('cf_selected_course') || 'CSE2724');
 
   async function loadSessions() {
     currentSessions = await CourseFlow.apiService.getSessionPlans(currentCourse);
@@ -435,7 +435,7 @@ let allAssessments = [];
 
 async function initAssessmentsPage() {
   const courseFilter = document.getElementById('assessmentCourseFilter');
-  let currentCourse = courseFilter ? courseFilter.value : 'CS301';
+  let currentCourse = courseFilter ? courseFilter.value : (localStorage.getItem('cf_selected_course') || 'CSE2724');
 
   async function load() {
     allAssessments = await CourseFlow.apiService.getAssessments(currentCourse);
@@ -552,15 +552,19 @@ let currentSelectedAssessment = null;
 
 async function initMarksPage() {
   const urlParams = new URLSearchParams(window.location.search);
-  const paramAsm = urlParams.get('assessment') || 'ASM01';
+  const paramAsm = urlParams.get('assessment');
 
   const asmSelect = document.getElementById('marksAssessmentSelect');
+  if (asmSelect && paramAsm) {
+    asmSelect.value = paramAsm;
+  }
 
   async function loadMarks() {
-    const asmId = asmSelect ? asmSelect.value : paramAsm;
     const allAsms = await CourseFlow.apiService.getAssessments();
-    currentSelectedAssessment = allAsms.find(a => a.id === asmId) || allAsms[0];
-    currentMarksMap = await CourseFlow.apiService.getMarks(asmId);
+    const asmId = asmSelect ? asmSelect.value : (paramAsm || (allAsms[0] ? allAsms[0].id : 4));
+    currentSelectedAssessment = allAsms.find(a => String(a.id) === String(asmId)) || allAsms[0];
+    if (!currentSelectedAssessment) return;
+    currentMarksMap = await CourseFlow.apiService.getMarks(currentSelectedAssessment.id);
     
     if (document.getElementById('marksMaxBadge')) {
       document.getElementById('marksMaxBadge').textContent = `Max Marks: ${currentSelectedAssessment.maxMarks}`;
@@ -569,7 +573,6 @@ async function initMarksPage() {
   }
 
   if (asmSelect) {
-    asmSelect.value = paramAsm;
     asmSelect.addEventListener('change', () => loadMarks());
   }
 
@@ -663,7 +666,7 @@ let currentAttendanceData = null;
 
 async function initAttendancePage() {
   const courseSelect = document.getElementById('attendanceCourseSelect');
-  let currentCourse = courseSelect ? courseSelect.value : 'CS301';
+  let currentCourse = courseSelect ? courseSelect.value : (localStorage.getItem('cf_selected_course') || 'CSE2724');
 
   async function load() {
     currentAttendanceData = await CourseFlow.apiService.getAttendance(currentCourse);
@@ -725,7 +728,7 @@ async function renderAttendanceInterface() {
   const dateSelect = document.getElementById('attendanceDateSelect');
   const dateIndex = dateSelect ? parseInt(dateSelect.value, 10) : 0;
   const courseSelect = document.getElementById('attendanceCourseSelect');
-  const courseId = courseSelect ? courseSelect.value : 'CS301';
+  const courseId = courseSelect ? courseSelect.value : (localStorage.getItem('cf_selected_course') || 'CSE2724');
 
   const students = await CourseFlow.apiService.getStudents(courseId);
   const totalSessions = currentAttendanceData.dates.length;
@@ -774,7 +777,7 @@ let feedbackChartInstance = null;
 
 async function initFeedbackPage() {
   const courseSelect = document.getElementById('feedbackCourseSelect');
-  let currentCourse = courseSelect ? courseSelect.value : 'CS301';
+  let currentCourse = courseSelect ? courseSelect.value : (localStorage.getItem('cf_selected_course') || 'CSE2724');
 
   async function load() {
     const data = await CourseFlow.apiService.getFeedback(currentCourse);

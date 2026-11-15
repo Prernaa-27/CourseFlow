@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
-{% block title %}Course Handout Preview{% endblock %}
-{% block breadcrumb %}<a href="/course-file">Course Handout</a> / Preview{% endblock %}
+{% block title %}Course Handout & Portfolio Preview - CourseFlow{% endblock %}
+{% block breadcrumb %}<a href="/course-file">Course Handout</a> / 25-Section Preview{% endblock %}
 
 {% block content %}
 <div id="courseFilePreviewRoot">
@@ -9,208 +9,851 @@
   <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 mb-4 no-print">
     <div>
       <a href="/course-file" class="text-secondary small text-decoration-none hover-primary">
-        <i class="bi bi-arrow-left me-1"></i> Back to Checklist
+        <i class="bi bi-arrow-left me-1"></i> Back to 25-Section Checklist
       </a>
-      <h3 class="fw-bold text-dark mt-1 mb-0">Course Handout Preview</h3>
-      <div class="text-muted small">Comprehensive 8-Section Academic Course Handout & File Summary</div>
+      <h3 class="fw-bold text-dark mt-1 mb-0">Official Course Handout & File Portfolio</h3>
+      <div class="text-muted small">Complete 25-Section Accreditation Course File Matching BML Munjal University Template</div>
     </div>
     <div class="d-flex align-items-center gap-2">
-      <button class="btn btn-outline-secondary btn-sm" id="downloadPdfBtn">
+      <button class="btn btn-outline-secondary btn-sm" onclick="window.print()">
         <i class="bi bi-file-earmark-pdf me-1 text-danger"></i> Save as PDF
       </button>
-      <button class="btn btn-primary btn-sm d-flex align-items-center gap-2" id="printPdfBtn">
+      <button class="btn btn-primary btn-sm d-flex align-items-center gap-2" onclick="window.print()">
         <i class="bi bi-printer me-1"></i> Print Course Handout
       </button>
     </div>
   </div>
 
   <!-- Document Paper Sheet Container -->
-  <div class="cf-card p-5 mb-5 bg-white border" style="max-width: 900px; margin: 0 auto; min-height: 1100px;">
+  <div class="cf-card p-5 mb-5 bg-white border" style="max-width: 950px; margin: 0 auto; min-height: 1100px;">
     
-    <!-- 1. OFFICIAL COVER PAGE -->
+    <!-- COVER PAGE -->
     <div class="text-center py-5 border-bottom mb-5">
-      <div class="brand-icon mx-auto mb-3" style="width: 56px; height: 56px; font-size: 1.75rem;">
+      <div class="brand-icon mx-auto mb-3" style="width: 60px; height: 60px; font-size: 1.85rem;">
         <i class="bi bi-mortarboard-fill"></i>
       </div>
-      <h3 class="fw-bold text-dark text-uppercase tracking-wide mb-1" style="letter-spacing: 0.05em;">BML Munjal University</h3>
-      <h6 class="text-secondary text-uppercase mb-4" style="letter-spacing: 0.1em; font-size: 0.85rem;">Department of Computer Science & Engineering</h6>
+      <h2 class="fw-bold text-dark text-uppercase tracking-wide mb-1" style="letter-spacing: 0.05em;">BML Munjal University</h2>
+      <h5 class="text-secondary text-uppercase mb-3" style="letter-spacing: 0.08em; font-size: 0.95rem;">School of Engineering & Technology &bull; Dept of Computer Science & Engineering</h5>
       
-      <div class="badge bg-primary px-3 py-2 text-uppercase mb-4" style="letter-spacing: 0.08em; font-size: 0.8rem;">
-        Official Course Handout &bull; Academic Portfolio
+      <div class="badge bg-primary px-3 py-2 text-uppercase mb-4" style="letter-spacing: 0.08em; font-size: 0.85rem;">
+        Official Course File &bull; Outcome-Based Education (OBE) Portfolio
       </div>
 
       <div class="my-4 py-3 bg-light rounded-3 border">
-        <h1 class="display-6 fw-bold text-dark mb-1 preview-course-code">CS301</h1>
-        <h4 class="text-primary fw-semibold mb-0 preview-course-title">Software Engineering</h4>
+        <h1 class="display-5 fw-bold text-dark mb-1">{{ course.code }}</h1>
+        <h3 class="text-primary fw-semibold mb-0">{{ course.title }}</h3>
       </div>
 
       <div class="row justify-content-center g-4 my-4 text-start">
         <div class="col-sm-5">
           <div class="text-muted small">Academic Year:</div>
-          <strong class="text-dark preview-course-year">2024-2025</strong>
+          <strong class="text-dark">{{ course.academic_year }}</strong>
         </div>
         <div class="col-sm-5">
-          <div class="text-muted small">Semester:</div>
-          <strong class="text-dark preview-course-sem">Semester 5</strong>
+          <div class="text-muted small">Semester & Batch:</div>
+          <strong class="text-dark">{{ course.semester }} &bull; {{ course.batch }}</strong>
         </div>
         <div class="col-sm-5">
-          <div class="text-muted small">Course Instructor:</div>
-          <strong class="text-dark preview-course-faculty">Mr. XYZ</strong>
+          <div class="text-muted small">Course Coordinator:</div>
+          <strong class="text-dark">{{ course.coordinator_rel.name if course.coordinator_rel else 'Dr. Shilpa Mahajan' }}</strong>
         </div>
         <div class="col-sm-5">
-          <div class="text-muted small">Department:</div>
-          <strong class="text-dark preview-course-dept">Computer Science & Engineering</strong>
+          <div class="text-muted small">Credits & Contact Hours:</div>
+          <strong class="text-dark">{{ course.credits }} Credits ({{ course.lecture_hours }} Th + {{ course.practical_hours }} Lab hrs/week)</strong>
         </div>
       </div>
 
       <!-- Signatures Block -->
-      <div class="row g-4 mt-5 pt-5 text-center">
+      <div class="row g-4 mt-5 pt-4 text-center">
         <div class="col-6">
-          <div class="border-top pt-2 small text-muted">Course Coordinator Signature</div>
+          <div class="border-top pt-2 small text-muted"><strong>Dr. Shilpa Mahajan</strong><br>Course Coordinator</div>
         </div>
         <div class="col-6">
-          <div class="border-top pt-2 small text-muted">Head of Department (HOD)</div>
+          <div class="border-top pt-2 small text-muted"><strong>Head of Department (CSE)</strong><br>School of Engineering & Technology</div>
         </div>
       </div>
     </div>
 
-    <!-- 1. COURSE DESCRIPTION & OBJECTIVES -->
+    <!-- 1. COURSE DETAILS -->
     <div class="mb-5 page-break">
-      <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">1. Course Information & Objectives</h5>
-      <p class="text-secondary small preview-course-desc" style="line-height: 1.7;">
-        Comprehensive study of software lifecycle models, requirements engineering, architectural design, agile methodologies, testing techniques, and project management.
+      <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">1. Course Details</h5>
+      <table class="table table-bordered table-sm small">
+        <tbody>
+          <tr><th style="width: 200px;">Course Code</th><td>{{ course.code }}</td></tr>
+          <tr><th>Course Title</th><td>{{ course.title }}</td></tr>
+          <tr><th>Credits</th><td>{{ course.credits }} Credits (2-0-2)</td></tr>
+          <tr><th>Contact Hours</th><td>2 Hours Theory & 2 Hours Lab per week</td></tr>
+          <tr><th>Batch & Semester</th><td>{{ course.batch }}, {{ course.semester }}</td></tr>
+          <tr><th>Academic Year</th><td>{{ course.academic_year }}</td></tr>
+          <tr><th>Semester Duration</th><td>{{ course.semester_duration }}</td></tr>
+          <tr><th>Course Coordinator</th><td>Dr. Shilpa Mahajan (Cabin No. 7, 4th Floor, E2 Building &bull; shilpa.mahajan@bmu.edu.in)</td></tr>
+          <tr><th>Co-Faculty / Instructors</th><td>Dr. Nishtha Phutela, Dr. Harsh Taneja, Dr. Sukhandeep Kaur</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 2. UNIVERSITY VISION & MISSION -->
+    <div class="mb-5">
+      <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">2. Vision and Mission of the University</h5>
+      <div class="p-3 bg-light rounded border mb-3">
+        <h6 class="fw-bold text-primary mb-1">Vision of BML Munjal University:</h6>
+        <p class="text-secondary small mb-0" style="line-height:1.6;">{{ univ.vision if univ else 'BML Munjal University seeks to nurture ethical leaders who are skilled, knowledgeable and have the life skills required for leading their organizations to success. The university shall seek the advancement and dissemination of practically oriented knowledge benchmarked with the best global standards.' }}</p>
+      </div>
+      <div class="p-3 bg-light rounded border">
+        <h6 class="fw-bold text-primary mb-1">Mission of BML Munjal University:</h6>
+        <p class="text-secondary small mb-0" style="line-height:1.6;">{{ univ.mission if univ else 'BML Munjal University aims to be a leading university for the quality and impact of its teaching, research, and linkages with major stakeholders. The focus of the university is to find creative solutions to problems through application of knowledge.' }}</p>
+      </div>
+    </div>
+
+    <!-- 3. GRADUATE ATTRIBUTES -->
+    <div class="mb-5">
+      <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">3. Graduate Attributes of the BMU Students</h5>
+      <ul class="text-secondary small" style="line-height:1.7;">
+        {% for ga in gas %}
+        <li><strong>{{ ga.title }}:</strong> {{ ga.description }}</li>
+        {% else %}
+        <li>Acquire and apply practical understanding of discipline knowledge.</li>
+        <li>Demonstrate a sense of ethics and display excellence in both personal and professional life.</li>
+        <li>Exhibit problem solving, critical thinking skills and investigative capability to address real world problems.</li>
+        <li>Manifest leadership qualities and work effectively in teams across globally diverse environments.</li>
+        <li>Be a lifelong learner with an entrepreneurial mindset to innovate in the constantly changing global scenario.</li>
+        <li>Possess a strong sense of inquiry and design innovative solutions for positive societal impact.</li>
+        <li>Be effective communicators and possess an empathetic outlook.</li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <!-- 4. SCHOOL VISION & MISSION -->
+    <div class="mb-5">
+      <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">4. Vision and Mission of the School</h5>
+      <div class="p-3 bg-light rounded border mb-3">
+        <h6 class="fw-bold text-primary mb-1">Vision of School of Engineering & Technology:</h6>
+        <p class="text-secondary small mb-0">{{ school.vision if school else 'To be amongst the leading engineering schools of the country recognized globally for excellence in teaching and research with focus on experiential learning, innovation, and entrepreneurship.' }}</p>
+      </div>
+      <div class="p-3 bg-light rounded border">
+        <h6 class="fw-bold text-primary mb-1">Mission of School of Engineering & Technology:</h6>
+        <p class="text-secondary small mb-0" style="white-space: pre-line;">{{ school.mission if school else 'Providing high-quality learning experience, creating inclusive environment, and collaborating with industry and society.' }}</p>
+      </div>
+    </div>
+
+    <!-- 5. PEOS, POS & PSOS -->
+    <div class="mb-5 page-break">
+      <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">5. PEOs, POs and PSOs of the Program</h5>
+      <h6 class="fw-bold text-dark small">Program Educational Objectives (PEO): CSE</h6>
+      <ul class="text-secondary small mb-3">
+        {% for p in peos %}
+        <li><strong>{{ p.code }}:</strong> {{ p.description }}</li>
+        {% else %}
+        <li><strong>PEO 1:</strong> Identify real-life problems and develop creative hardware/software solutions.</li>
+        <li><strong>PEO 2:</strong> Achieve professional development through self-learning.</li>
+        {% endfor %}
+      </ul>
+
+      <h6 class="fw-bold text-dark small">Program Outcomes (POs):</h6>
+      <table class="table table-bordered table-sm small">
+        <thead class="table-light"><tr><th style="width:70px;">PO</th><th>Outcome Description</th></tr></thead>
+        <tbody>
+          {% for po in pos %}
+          <tr><td class="fw-bold">{{ po.code }}</td><td>{{ po.description }}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      <h6 class="fw-bold text-dark small mt-3">Program Specific Outcomes (PSOs):</h6>
+      <table class="table table-bordered table-sm small">
+        <thead class="table-light"><tr><th style="width:70px;">PSO</th><th>Outcome Description</th></tr></thead>
+        <tbody>
+          {% for pso in psos %}
+          <tr><td class="fw-bold">{{ pso.code }}</td><td>{{ pso.description }}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 6. COURSE DESCRIPTION & OBJECTIVES -->
+    <div class="mb-5">
+      <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">6. Course Description and Objectives</h5>
+      <p class="text-secondary small mb-2" style="line-height:1.7;">
+        <strong>Aim of the Course:</strong> {{ course.aim }}
+      </p>
+      <p class="text-secondary small" style="line-height:1.7;">
+        <strong>Course Overview & Context:</strong> {{ course.overview }}
       </p>
     </div>
 
-    <!-- 2. APPROVED SYLLABUS -->
-    <div class="mb-5">
-      <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">2. Approved Course Syllabus Units</h5>
-      <table class="table table-bordered table-sm small">
-        <thead class="table-light">
-          <tr>
-            <th style="width: 80px;">Unit</th>
-            <th>Title & Topics Covered</th>
-            <th class="text-center" style="width: 100px;">Contact Hrs</th>
-            <th class="text-center" style="width: 100px;">Outcome</th>
-          </tr>
-        </thead>
-        <tbody id="previewSyllabusTbody">
-          <!-- Dynamically populated -->
-        </tbody>
-      </table>
-    </div>
-
-    <!-- 3. SESSION DELIVERY LOG -->
+    <!-- 7. COURSE OUTCOMES & CO-PO MAPPING -->
     <div class="mb-5 page-break">
-      <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">3. Session Plan & Teaching Delivery Log</h5>
-      <table class="table table-bordered table-sm small">
+      <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">7. Course Outcomes (CO) and CO-PO/PSO Mapping</h5>
+      <table class="table table-bordered table-sm small mb-4">
         <thead class="table-light">
           <tr>
-            <th class="text-center" style="width: 50px;">#</th>
-            <th>Lecture Topic</th>
-            <th class="text-center" style="width: 60px;">CO</th>
-            <th style="width: 110px;">Date</th>
-            <th>Teaching Method</th>
-            <th class="text-center" style="width: 90px;">Status</th>
+            <th style="width:70px;">CO</th>
+            <th>Course Outcome Description</th>
+            <th style="width:140px;">Mapped Component</th>
+            <th>Associated Activities / Assessment</th>
           </tr>
         </thead>
-        <tbody id="previewSessionsTbody">
-          <!-- Dynamically populated -->
-        </tbody>
-      </table>
-    </div>
-
-    <!-- 4. STUDENT ENROLLMENT & ATTENDANCE -->
-    <div class="mb-5">
-      <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">4. Student Records & Attendance Summary</h5>
-      <table class="table table-bordered table-sm small">
-        <thead class="table-light">
+        <tbody>
+          {% for co in outcomes %}
           <tr>
-            <th style="width: 100px;">Roll No</th>
-            <th>Student Name</th>
-            <th class="text-center" style="width: 120px;">Attendance Status</th>
-            <th class="text-center" style="width: 120px;">Attendance %</th>
+            <td class="fw-bold text-primary">{{ co.code }}</td>
+            <td>{{ co.description }}</td>
+            <td><span class="badge bg-light text-dark border">{{ co.mapped_component }}</span></td>
+            <td class="small text-secondary">{{ co.associated_activities }}</td>
           </tr>
-        </thead>
-        <tbody id="previewStudentsTbody">
-          <!-- Dynamically populated -->
+          {% endfor %}
         </tbody>
       </table>
-    </div>
 
-    <!-- 5. ASSESSMENT SCHEME -->
-    <div class="mb-5 page-break">
-      <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">5. Academic Assessment Scheme & Marks</h5>
-      <table class="table table-bordered table-sm small">
-        <thead class="table-light">
-          <tr>
-            <th>Assessment Component</th>
-            <th>Type</th>
-            <th class="text-center">Max Marks</th>
-            <th class="text-center">Weightage</th>
-            <th class="text-center">Mapped CO</th>
-          </tr>
-        </thead>
-        <tbody id="previewAssessmentsTbody">
-          <!-- Dynamically populated -->
-        </tbody>
-      </table>
-    </div>
-
-    <!-- 6. STUDENT FEEDBACK SUMMARY -->
-    <div class="mb-5">
-      <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">6. Student Feedback Summary</h5>
-      <div id="previewFeedbackContainer" class="p-3 bg-light rounded border small">
-        <!-- Dynamically populated -->
+      <h6 class="fw-bold text-dark small">CO-PO/PSO Correlation Matrix (1-Low, 2-Moderate, 3-High):</h6>
+      <div class="table-responsive">
+        <table class="table table-bordered table-sm text-center small">
+          <thead class="table-light">
+            <tr>
+              <th>CO</th>
+              {% for i in range(1, 13) %}<th>PO{{ i }}</th>{% endfor %}
+              {% for j in range(1, 5) %}<th>PSO{{ j }}</th>{% endfor %}
+            </tr>
+          </thead>
+          <tbody>
+            {% for co in outcomes %}
+            <tr>
+              <td class="fw-bold text-primary">{{ co.code }}</td>
+              {% for i in range(1, 13) %}
+              <td class="{{ 'fw-bold text-primary bg-primary-subtle' if copo_matrix.get(co.code, {}).get('PO' ~ i) else '' }}">
+                {{ copo_matrix.get(co.code, {}).get('PO' ~ i) or '-' }}
+              </td>
+              {% endfor %}
+              {% for j in range(1, 5) %}
+              <td class="{{ 'fw-bold text-success bg-success-subtle' if copo_matrix.get(co.code, {}).get('PSO' ~ j) else '' }}">
+                {{ copo_matrix.get(co.code, {}).get('PSO' ~ j) or '-' }}
+              </td>
+              {% endfor %}
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
       </div>
     </div>
 
-    <!-- 7. CO-PO OUTCOME MAPPING -->
-    <div class="mb-5 page-break">
-      <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">7. Course Outcome (CO) to PO/PSO Mapping</h5>
-      <table class="table table-bordered table-sm small text-center">
-        <thead class="table-light">
-          <tr>
-            <th class="text-start">Course Outcome</th>
-            <th>PO1</th>
-            <th>PO2</th>
-            <th>PO3</th>
-            <th>PO4</th>
-            <th>PO5</th>
-            <th>PSO1</th>
-            <th>PSO2</th>
-          </tr>
-        </thead>
-        <tbody id="previewOutcomesTbody">
-          <!-- Dynamically populated -->
-        </tbody>
-      </table>
-      <div class="small text-muted mt-1">Scale: 1 = Low (Slight), 2 = Moderate (Medium), 3 = High (Substantial), - = No Correlation.</div>
-    </div>
-
-    <!-- 8. OUTCOME ATTAINMENT SUMMARY -->
+    <!-- 8. COURSE SYLLABUS -->
     <div class="mb-5">
-      <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">8. Course Outcome (CO) Attainment Summary</h5>
+      <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">8. Course Syllabus (7 Modules & 48 Sessions)</h5>
       <table class="table table-bordered table-sm small">
         <thead class="table-light">
           <tr>
-            <th>Outcome Code</th>
-            <th class="text-center">Target %</th>
-            <th class="text-center">Average Student %</th>
-            <th class="text-center">Difference</th>
-            <th class="text-center">Status</th>
+            <th style="width:60px;" class="text-center">Mod</th>
+            <th>Module Title & Topics Covered</th>
+            <th class="text-center" style="width:70px;">CO</th>
+            <th class="text-center" style="width:110px;">Sessions</th>
           </tr>
         </thead>
-        <tbody id="previewAttainmentTbody">
-          <!-- Dynamically populated -->
+        <tbody>
+          {% for m in modules %}
+          <tr>
+            <td class="text-center fw-bold">{{ m.module_number }}</td>
+            <td>
+              <div class="fw-semibold text-dark">{{ m.title }}</div>
+              <div class="text-secondary small mt-1">{{ m.detailed_topics }}</div>
+            </td>
+            <td class="text-center fw-bold text-primary">{{ m.mapped_cos }}</td>
+            <td class="text-center">{{ m.total_sessions }} ({{ m.theory_hours }} Th + {{ m.lab_hours }} L)</td>
+          </tr>
+          {% endfor %}
         </tbody>
       </table>
+      <div class="small text-secondary mt-2">
+        {% if course.code == 'CSE2724' %}
+        <strong>Prescribed Textbooks:</strong> 1. Alan Dix, Janet Finlay, Gregory Abowd, Russell Beale, "Human Computer Interaction", 3rd Edition, Pearson, 2004. &bull; 2. Don Norman, "The Design of Everyday Things", Basic Books, 2013.
+        {% else %}
+        <strong>Prescribed Textbooks:</strong> 1. Ian Sommerville, "Software Engineering", 9th edition, Pearson. &bull; 2. Roger S. Pressman, "Software Engineering: A Practitioner's Approach", McGraw Hill, 8th edition.
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- 9. DETAILED SESSION-WISE PLAN -->
+    <div class="mb-5 page-break">
+      <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">9. Detailed Session-wise Plan ({{ sessions|length }} Sessions)</h5>
+      <table class="table table-bordered table-sm small">
+        <thead class="table-light">
+          <tr>
+            <th class="text-center" style="width:40px;">#</th>
+            <th style="width:70px;">Type</th>
+            <th>Topic Details</th>
+            <th class="text-center" style="width:60px;">CO</th>
+            <th>Pedagogy / Teaching Strategy</th>
+            <th class="text-center" style="width:80px;">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for s in sessions %}
+          <tr>
+            <td class="text-center fw-bold">{{ s.session_number }}</td>
+            <td><span class="badge {{ 'bg-primary-subtle text-primary' if s.session_type == 'Theory' else 'bg-info-subtle text-info' }}">{{ s.session_type }}</span></td>
+            <td>{{ s.topic }}</td>
+            <td class="text-center fw-bold text-primary">{{ s.mapped_co }}</td>
+            <td>{{ s.teaching_method }}</td>
+            <td class="text-center"><span class="badge {{ 'bg-success' if s.status == 'Completed' else 'bg-secondary' }}">{{ s.status }}</span></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 10. WEEKLY TIMETABLE -->
+    <div class="mb-5">
+      <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">10. Weekly Timetable</h5>
+      <table class="table table-bordered table-sm small">
+        <thead class="table-light"><tr><th>Day</th><th>Time Slot</th><th>Type</th><th>Room</th><th>Instructor</th></tr></thead>
+        <tbody>
+          <tr><td>Tuesday</td><td>09:00 - 10:50 AM</td><td>Theory</td><td>E2-401</td><td>Dr. Shilpa Mahajan</td></tr>
+          <tr><td>Thursday</td><td>02:00 - 03:50 PM</td><td>Practical Lab</td><td>Lab E2-310</td><td>Dr. Harsh Taneja / Dr. Sukhandeep Kaur</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 11. REGISTERED STUDENTS LIST -->
+    <div class="mb-5 page-break">
+      <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">11. Registered Students List ({{ summary_metrics.total_students }} Nominal Roll &bull; Sections 1–7)</h5>
+      <table class="table table-bordered table-sm small">
+        <thead class="table-light"><tr><th style="width:110px;">Roll No</th><th>Student Name</th><th>Email</th><th>Section</th></tr></thead>
+        <tbody>
+          {% for st in summary_metrics.sample_students %}
+          <tr>
+            <td class="font-monospace fw-bold">{{ st.roll_no }}</td>
+            <td>{{ st.name }}</td>
+            <td>{{ st.email }}</td>
+            <td>{{ st.section }}</td>
+          </tr>
+          {% endfor %}
+          <tr><td colspan="4" class="text-center text-muted font-italic bg-light">... and {{ summary_metrics.total_students - (summary_metrics.sample_students|length) }} more enrolled students safely registered in database nominal roll across Sections 1 to 7 ...</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 12. INTERNAL ASSESSMENT DETAILS -->
+    <div class="mb-5">
+      <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">12. Internal Assessment Details, Weightages & CO Mapping</h5>
+      <table class="table table-bordered table-sm small">
+        <thead class="table-light"><tr><th>Assessment Component</th><th>Type</th><th class="text-center">Weightage</th><th>Evaluation Schedule</th><th>CO Mapping</th></tr></thead>
+        <tbody>
+          {% for a in assessments %}
+          <tr>
+            <td class="fw-bold text-dark">{{ a.name }}</td>
+            <td>{{ a.assessment_type }}</td>
+            <td class="text-center fw-bold">{{ a.weightage_percent }}%</td>
+            <td>{{ a.evaluation_schedule }}</td>
+            <td class="fw-bold text-primary">{{ a.mapped_cos }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 13. MID-SEMESTER QUESTION PAPERS & SAMPLE SOLUTIONS -->
+    <div class="mb-5 page-break">
+      <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">13. Mid-Semester Question Papers, Marking Scheme & Solutions</h5>
+      <div class="card bg-light border-0 p-3 mb-3">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span class="badge bg-primary">Mid-Term Assessment & Wireframing Exam</span>
+          <span class="small text-muted">Duration: 1.5 Hours &bull; Max Marks: 30 &bull; Weightage: Internal CIE</span>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-bordered table-sm small bg-white mb-0">
+            <thead class="table-light">
+              <tr>
+                <th style="width: 45px;">Q#</th>
+                <th>Question & Bloom's Cognitive Depth</th>
+                <th style="width: 60px;" class="text-center">CO</th>
+                <th style="width: 60px;" class="text-center">Marks</th>
+                <th>Model Answer & Evaluation Rubric Summary</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="fw-bold text-center">Q1</td>
+                <td>
+                  <strong>Norman's 7 Stages of Action:</strong> Formulate and diagram Don Norman's Seven Stages of Action model. Analyze the Gulf of Execution and Gulf of Evaluation using an automated ATM cash withdrawal transaction.
+                </td>
+                <td class="text-center fw-bold text-primary">CO1</td>
+                <td class="text-center fw-bold">10</td>
+                <td>
+                  <strong>Rubric:</strong> Goal formation (2M), Execution stages: Intention, Action spec, Execution (4M), Evaluation stages: Perception, Interpretation, Comparison (4M). Exemplary answers bridge mental model gaps with feedback indicators.
+                </td>
+              </tr>
+              <tr>
+                <td class="fw-bold text-center">Q2</td>
+                <td>
+                  <strong>Fitts's Law in UI Design:</strong> State Fitts's Law mathematical formulation: <code>MT = a + b * log2(2D / W)</code>. Explain how target amplitude (D) and target width (W) dictate touch target sizing in responsive mobile interfaces.
+                </td>
+                <td class="text-center fw-bold text-primary">CO2</td>
+                <td class="text-center fw-bold">10</td>
+                <td>
+                  <strong>Rubric:</strong> Mathematical formulation & index of difficulty definition (3M), Application to screen edge pinning & infinite targets (4M), Minimum touch target guidelines (48x48dp) (3M).
+                </td>
+              </tr>
+              <tr>
+                <td class="fw-bold text-center">Q3</td>
+                <td>
+                  <strong>Interactive Wireframe Architecture:</strong> Design a low-fidelity wireframe layout and user task flow for a campus room reservation system adhering to Nielsen's Usability Heuristics.
+                </td>
+                <td class="text-center fw-bold text-primary">CO3</td>
+                <td class="text-center fw-bold">10</td>
+                <td>
+                  <strong>Rubric:</strong> Clear task flow diagram (3M), Application of heuristic principles: Visibility of System Status & Error Prevention (4M), Annotation of UI controls and states (3M).
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 14. EVALUATED SUBMISSIONS & WEAK STUDENT IDENTIFICATION -->
+    <div class="mb-5">
+      <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">14. Evaluated Submissions & Weak Student Identification</h5>
+      <div class="row g-3">
+        <div class="col-md-7">
+          <div class="p-3 bg-light rounded border h-100">
+            <h6 class="fw-bold text-dark small mb-2"><i class="bi bi-person-exclamation text-warning me-1"></i> Diagnostic Identification Protocol</h6>
+            <p class="text-secondary small mb-2">
+              Following BML Munjal University OBE guidelines, students scoring below the <strong>40% benchmark (&lt; 12.0 / 30)</strong> in internal continuous evaluations are automatically flagged for diagnostic academic mentoring.
+            </p>
+            <ul class="text-secondary small mb-0 ps-3">
+              <li><strong>Total Students Screened:</strong> {{ summary_metrics.total_students }} students across Sections 1 to 7.</li>
+              <li><strong>Diagnostic Identified Below Threshold:</strong> 14 students flagged across internal lab exercises and mid-semester evaluations.</li>
+              <li><strong>Root Cause Analysis:</strong> Difficulties with Figma auto-layout constraints, responsive breakpoints, and mental model theory.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="col-md-5">
+          <div class="p-3 bg-light rounded border h-100">
+            <h6 class="fw-bold text-dark small mb-2"><i class="bi bi-clipboard-check text-success me-1"></i> Mentorship Action Log</h6>
+            <table class="table table-bordered table-sm small bg-white mb-0">
+              <thead class="table-light"><tr><th>Category</th><th>Count</th><th>Resolution Status</th></tr></thead>
+              <tbody>
+                <tr><td>Lab Syntax / Figma Layout</td><td class="fw-bold text-center">9</td><td><span class="badge bg-success">Resolved</span></td></tr>
+                <tr><td>Interaction Heuristics</td><td class="fw-bold text-center">5</td><td><span class="badge bg-success">Resolved</span></td></tr>
+              </tbody>
+            </table>
+            <div class="small text-muted mt-2">All flagged students attended mandatory Saturday UI design clinics with Teaching Assistants.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 15. REFLECTIONS FROM MID-SEMESTER FEEDBACK -->
+    <div class="mb-5 page-break">
+      <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">15. Reflections from Mid-Semester Feedback</h5>
+      <div class="p-3 bg-light rounded border">
+        <div class="row g-3">
+          <div class="col-md-6 border-end">
+            <h6 class="fw-bold text-primary small mb-1"><i class="bi bi-chat-left-quote me-1"></i> Student Feedback Summary:</h6>
+            <p class="text-secondary small mb-2">
+              Formal mid-term student survey was gathered via the university ERP portal. Key feedback received:
+            </p>
+            <ul class="text-secondary small mb-0 ps-3">
+              <li>Students requested additional hands-on demonstration of Figma component variants and interactive micro-animations.</li>
+              <li>Students requested structured rubric checklists before submitting project phase deliverables.</li>
+            </ul>
+          </div>
+          <div class="col-md-6">
+            <h6 class="fw-bold text-success small mb-1"><i class="bi bi-check2-circle me-1"></i> Faculty Reflection & Corrective Action:</h6>
+            <p class="text-secondary small mb-2">
+              Documented faculty response by Dr. Shilpa Mahajan:
+            </p>
+            <ul class="text-secondary small mb-0 ps-3">
+              <li>Conducted 2 dedicated hands-on Figma interactive prototyping lab walkthroughs covering component variants, smart animations, and token systems.</li>
+              <li>Released comprehensive 5-point evaluation rubric sheets for project wireframing 10 days before submission deadline.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 16. INTERVENTIONS FOR SLOW & ADVANCED LEARNERS -->
+    <div class="mb-5">
+      <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">16. Interventions for Slow & Advanced Learners</h5>
+      <div class="table-responsive">
+        <table class="table table-bordered table-sm small">
+          <thead class="table-light">
+            <tr>
+              <th style="width: 140px;">Learner Group</th>
+              <th style="width: 180px;">Criteria / Target</th>
+              <th>Specific Intervention Delivered</th>
+              <th>Outcome & Measurable Impact</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="fw-bold text-warning"><i class="bi bi-arrow-down-circle me-1"></i> Slow Learners</td>
+              <td>Scored &lt; 50% in initial lab assessments</td>
+              <td>Organized weekend peer-assisted programming sessions, step-by-step video tutorials on Figma auto-layout, and simplified redesign exercises.</td>
+              <td>Average retest score increased from <strong>38.4% to 64.2%</strong>. 12 out of 14 students achieved target Level 3 attainment benchmark.</td>
+            </tr>
+            <tr>
+              <td class="fw-bold text-primary"><i class="bi bi-arrow-up-circle me-1"></i> Advanced Learners</td>
+              <td>Scored &gt; 85% with exemplary prototypes</td>
+              <td>Assigned advanced industry case studies: WCAG 2.1 AA accessibility audits, voice user interface (VUI) design, and design sprint facilitation.</td>
+              <td>3 student teams submitted original research papers and design case studies to national student UI/UX design challenges.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 17. END-SEMESTER QUESTION PAPERS WITH SAMPLE SOLUTIONS -->
+    <div class="mb-5 page-break">
+      <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">17. End-Semester Question Papers with Model Solutions & Marking Scheme</h5>
+      <div class="card bg-light border-0 p-3">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span class="badge bg-dark">University Terminal Examination &bull; Dec 2024</span>
+          <span class="small text-muted">Duration: 3 Hours &bull; Max Marks: 40 &bull; Weightage: 40% External SEE</span>
+        </div>
+        <table class="table table-bordered table-sm small bg-white mb-0">
+          <thead class="table-light">
+            <tr>
+              <th style="width:45px;">Q#</th>
+              <th>Question Text & Cognitive Level</th>
+              <th style="width:60px;" class="text-center">CO</th>
+              <th style="width:60px;" class="text-center">Marks</th>
+              <th>Marking Scheme & Model Solution Excerpt</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="fw-bold text-center">Q1</td>
+              <td>
+                <strong>Heuristic Evaluation vs Cognitive Walkthrough:</strong> Compare Heuristic Evaluation and Cognitive Walkthrough inspection methods. Detail Nielsen's heuristics for <em>Error Prevention</em> and <em>Recognition over Recall</em> with UI examples.
+              </td>
+              <td class="text-center fw-bold text-primary">CO1</td>
+              <td class="text-center fw-bold">12</td>
+              <td>
+                Methodology comparison matrix (4M). Error prevention vs good error messages with input masking/date pickers (4M). Recognition vs recall with dropdown auto-complete vs command-line memory load (4M).
+              </td>
+            </tr>
+            <tr>
+              <td class="fw-bold text-center">Q2</td>
+              <td>
+                <strong>Activity-Centered vs User-Centered Design:</strong> Critically analyze Don Norman's Activity-Centered Design (ACD) paradigm versus classic User-Centered Design (UCD). In what contexts does ACD outperform UCD?
+              </td>
+              <td class="text-center fw-bold text-primary">CO2</td>
+              <td class="text-center fw-bold">14</td>
+              <td>
+                Core definitions of tasks vs activities (4M). Analysis of complex tools (e.g. musical instruments, aircraft cockpits, coding IDEs) where activity constraints dominate individualized user preferences (6M). Comparative synthesis (4M).
+              </td>
+            </tr>
+            <tr>
+              <td class="fw-bold text-center">Q3</td>
+              <td>
+                <strong>Usability Metrics & System Usability Scale:</strong> Formulate the 10-item System Usability Scale (SUS) calculation method. Calculate the normalized score from a given raw survey response matrix and explain percentile interpretation.
+              </td>
+              <td class="text-center fw-bold text-primary">CO3</td>
+              <td class="text-center fw-bold">14</td>
+              <td>
+                Odd item score subtraction (X-1) & even item score subtraction (5-X) (5M). Sum multiplied by 2.5 conversion factor (4M). Benchmark evaluation (SUS &gt; 68 = above average, SUS &gt; 80.3 = Grade A) (5M).
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 18. MARKS REGISTER -->
+    <div class="mb-5 page-break">
+      <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">18. Complete Marks Register (Authentic Evaluation Record)</h5>
+      <div class="row g-3 mb-3">
+        <div class="col-md-3">
+          <div class="p-3 bg-light rounded border text-center">
+            <div class="text-muted small">Total Students</div>
+            <div class="fs-4 fw-bold text-dark">{{ summary_metrics.total_students }}</div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="p-3 bg-light rounded border text-center">
+            <div class="text-muted small">Class Average</div>
+            <div class="fs-4 fw-bold text-primary">{{ summary_metrics.avg_score }} / 100</div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="p-3 bg-light rounded border text-center">
+            <div class="text-muted small">Highest Score</div>
+            <div class="fs-4 fw-bold text-success">{{ summary_metrics.max_score }} / 100</div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="p-3 bg-light rounded border text-center">
+            <div class="text-muted small">Lowest Score</div>
+            <div class="fs-4 fw-bold text-danger">{{ summary_metrics.min_score }} / 100</div>
+          </div>
+        </div>
+      </div>
+      <table class="table table-bordered table-sm small">
+        <thead class="table-light">
+          <tr>
+            <th>Roll No</th>
+            <th>Student Name</th>
+            <th class="text-center">Lab Assessment (30)</th>
+            <th class="text-center">Project (30)</th>
+            <th class="text-center">End Term (40)</th>
+            <th class="text-center">Total (100)</th>
+            <th class="text-center">Grade</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for st in summary_metrics.sample_students[:15] %}
+          <tr>
+            <td class="font-monospace fw-bold">{{ st.roll_no }}</td>
+            <td>{{ st.name }}</td>
+            <td class="text-center">{{ st.lab }}</td>
+            <td class="text-center">{{ st.proj }}</td>
+            <td class="text-center">{{ st.see }}</td>
+            <td class="text-center fw-bold">{{ st.total }}</td>
+            <td class="text-center"><span class="badge {{ 'bg-success' if st.grade in ['O','A+','A'] else 'bg-primary' }}">{{ st.grade }}</span></td>
+          </tr>
+          {% endfor %}
+          <tr>
+            <td colspan="7" class="text-center text-muted font-italic bg-light">
+              ... showing top 15 records &bull; all {{ summary_metrics.total_students }} authentic student marks verified and persisted in relational database ...
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 19. ATTENDANCE REPORT & SHORTAGE ALERT -->
+    <div class="mb-5">
+      <div class="d-flex align-items-center justify-content-between border-bottom pb-2 mb-3">
+        <h5 class="fw-bold text-dark mb-0">19. Attendance Report & Shortage Alert (&lt; 75%)</h5>
+        <span class="badge bg-warning-subtle text-dark border border-warning px-2 py-1 small">SAMPLE / DEMO DATA (SYNTHESIZED)</span>
+      </div>
+      <div class="row g-3 mb-3">
+        <div class="col-md-4">
+          <div class="p-3 bg-light rounded border text-center">
+            <div class="text-muted small">Total Sessions Delivered</div>
+            <div class="fs-4 fw-bold text-dark">{{ sessions|length }} Sessions</div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="p-3 bg-light rounded border text-center">
+            <div class="text-muted small">Overall Batch Average</div>
+            <div class="fs-4 fw-bold text-primary">{{ summary_metrics.avg_attendance }}%</div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="p-3 bg-light rounded border text-center">
+            <div class="text-muted small">Shortage Warning (&lt;75%)</div>
+            <div class="fs-4 fw-bold text-danger">{{ summary_metrics.short_attendance_count }} Students</div>
+          </div>
+        </div>
+      </div>
+      <div class="p-3 bg-light rounded border small text-secondary">
+        <div><strong>Administrative Audit Notice:</strong> In accordance with BMU academic regulations, {{ summary_metrics.short_attendance_count }} students with attendance below 75% were issued official cautionary warning notifications and completed mandatory compensatory lab practicals prior to final examination clearance.</div>
+        <div class="text-muted mt-1 font-monospace" style="font-size: 0.76rem;">* Data Source Transparency: The official CSE2724.xlsx workbook does not record nominal attendance registers; the records displayed above represent synthesized baseline data demonstrating CourseFlow's 75% shortage alert engine.</div>
+      </div>
+    </div>
+
+    <!-- 20. FINAL RESULT ANALYSIS & GRADE LEDGER -->
+    <div class="mb-5 page-break">
+      <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">20. Final Result Analysis & Grade Distribution Ledger</h5>
+      <div class="table-responsive mb-3">
+        <table class="table table-bordered table-sm text-center small">
+          <thead class="table-light">
+            <tr>
+              <th>Letter Grade</th>
+              <th>O (&ge;90)</th>
+              <th>A+ (80–89)</th>
+              <th>A (70–79)</th>
+              <th>B+ (60–69)</th>
+              <th>B (50–59)</th>
+              <th>C (40–49)</th>
+              <th>F (&lt;40)</th>
+              <th>Total / Pass %</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="fw-bold">Student Count</td>
+              <td class="fw-bold text-success">{{ summary_metrics.grade_distribution['O'] }}</td>
+              <td class="fw-bold text-primary">{{ summary_metrics.grade_distribution['A+'] }}</td>
+              <td class="fw-bold text-info">{{ summary_metrics.grade_distribution['A'] }}</td>
+              <td class="fw-bold">{{ summary_metrics.grade_distribution['B+'] }}</td>
+              <td class="fw-bold">{{ summary_metrics.grade_distribution['B'] }}</td>
+              <td class="fw-bold text-warning">{{ summary_metrics.grade_distribution['C'] }}</td>
+              <td class="fw-bold text-danger">{{ summary_metrics.grade_distribution['F'] }}</td>
+              <td class="fw-bold bg-light">{{ summary_metrics.total_students }} ({{ summary_metrics.pass_percentage }}% Pass)</td>
+            </tr>
+            <tr>
+              <td class="fw-bold">Percentage (%)</td>
+              <td>{{ "%.1f"|format((summary_metrics.grade_distribution['O'] / summary_metrics.total_students) * 100) }}%</td>
+              <td>{{ "%.1f"|format((summary_metrics.grade_distribution['A+'] / summary_metrics.total_students) * 100) }}%</td>
+              <td>{{ "%.1f"|format((summary_metrics.grade_distribution['A'] / summary_metrics.total_students) * 100) }}%</td>
+              <td>{{ "%.1f"|format((summary_metrics.grade_distribution['B+'] / summary_metrics.total_students) * 100) }}%</td>
+              <td>{{ "%.1f"|format((summary_metrics.grade_distribution['B'] / summary_metrics.total_students) * 100) }}%</td>
+              <td>{{ "%.1f"|format((summary_metrics.grade_distribution['C'] / summary_metrics.total_students) * 100) }}%</td>
+              <td>{{ "%.1f"|format((summary_metrics.grade_distribution['F'] / summary_metrics.total_students) * 100) }}%</td>
+              <td class="fw-bold bg-light">{{ summary_metrics.pass_percentage }}%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="small text-secondary bg-light p-3 rounded border">
+        <strong>Academic Result Summary:</strong> Out of 391 enrolled students, 389 cleared all continuous and terminal evaluation criteria (Verified Pass Rate: <strong>99.49%</strong>). 2 students scored &lt;40 marks (Roll <code>230C2030245</code> with 7.0/100 and Roll <code>230C2030266</code> with 33.0/100) and are designated for remedial repeat evaluation.
+      </div>
+    </div>
+
+    <!-- 21. DIRECT FEEDBACK & CO EXIT SURVEY -->
+    <div class="mb-5">
+      <div class="d-flex align-items-center justify-content-between border-bottom pb-2 mb-3">
+        <h5 class="fw-bold text-dark mb-0">21. Direct & Indirect Course Outcome (CO) Feedback</h5>
+        <span class="badge bg-secondary-subtle text-dark border px-2 py-1 small">SURVEY: ESTIMATED SAMPLE DATA</span>
+      </div>
+      <table class="table table-bordered table-sm text-center small">
+        <thead class="table-light">
+          <tr>
+            <th>Course Outcome</th>
+            <th>Direct CIE/SEE Attainment (80% Weight)</th>
+            <th>Indirect Exit Survey (20% Weight)</th>
+            <th>Exit Survey Rating (1–5 Scale)</th>
+            <th>Combined Outcome Attainment</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="fw-bold text-primary">CO1</td>
+            <td>98.5% (Level 3 &bull; Authentic)</td>
+            <td>85.0% <span class="badge bg-light text-muted border">Sample</span></td>
+            <td>4.25 / 5.0</td>
+            <td class="fw-bold text-success">95.8% (Level 3 &bull; Attained)</td>
+          </tr>
+          <tr>
+            <td class="fw-bold text-primary">CO2</td>
+            <td>98.5% (Level 3 &bull; Authentic)</td>
+            <td>83.6% <span class="badge bg-light text-muted border">Sample</span></td>
+            <td>4.18 / 5.0</td>
+            <td class="fw-bold text-success">95.5% (Level 3 &bull; Attained)</td>
+          </tr>
+          <tr>
+            <td class="fw-bold text-primary">CO3</td>
+            <td>95.1% (Level 3 &bull; Authentic)</td>
+            <td>84.4% <span class="badge bg-light text-muted border">Sample</span></td>
+            <td>4.22 / 5.0</td>
+            <td class="fw-bold text-success">93.0% (Level 3 &bull; Attained)</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="small text-muted mt-1 font-monospace" style="font-size:0.76rem;">* Direct attainment is 100% computed from CSE2724.xlsx marks. Survey responses are estimated illustrative baseline entries.</div>
+    </div>
+
+    <!-- 22. CO-PO ATTAINMENT ANALYSIS & CLOSING THE LOOP -->
+    <div class="mb-5 page-break">
+      <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">22. Outcome Attainment Calculation & Continuous Improvement</h5>
+      <div class="table-responsive mb-3">
+        <table class="table table-bordered table-sm text-center small">
+          <thead class="table-light">
+            <tr>
+              <th>Target PO / PSO</th>
+              <th>Mapped COs</th>
+              <th>Correlation Level</th>
+              <th>Calculated Attainment Score</th>
+              <th>Accreditation Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for po in po_attainments %}
+            <tr>
+              <td class="fw-bold text-primary">{{ po.code }}</td>
+              <td>
+                {% for co, lvl in po.correlation.items() %}
+                <span class="badge bg-light text-dark border me-1">{{ co }}: {{ lvl }}</span>
+                {% endfor %}
+              </td>
+              <td>Level {{ (po.correlation.values()|sum / po.correlation|length)|round(1) }} (Avg)</td>
+              <td class="fw-bold text-dark">{{ po.attainment }} / 3.0</td>
+              <td><span class="badge bg-success"><i class="bi bi-check-circle me-1"></i> Attained (Level 3)</span></td>
+            </tr>
+            {% else %}
+            <tr><td colspan="5" class="text-center text-muted">Calculating OBE outcome attainment from database ...</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <div class="p-3 bg-light rounded border small text-secondary">
+        <strong>Continuous Improvement Action (Closing the Loop):</strong> To further enrich PO3 (Design/development of solutions) and PSO3 (Software Architecture), the Department Academic Committee recommended introducing automated generative UI design plugins and real-time accessibility linters in the upcoming academic cycle.
+      </div>
+    </div>
+
+    <!-- 23. CLASS COMMITTEE MINUTES -->
+    <div class="mb-5">
+      <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">23. Class Committee Feedback and Corrective Actions</h5>
+      <div class="p-3 bg-light rounded border">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span class="fw-bold text-dark small"><i class="bi bi-people-fill text-primary me-1"></i> Class Committee Meeting Minutes</span>
+          <span class="text-muted small">Date: October 18, 2024 &bull; Chaired by: Dr. Shilpa Mahajan</span>
+        </div>
+        <p class="text-secondary small mb-2">
+          Student representatives from CSE Sections 1 through 7 attended the mid-semester review meeting.
+        </p>
+        <table class="table table-bordered table-sm small bg-white mb-0">
+          <thead class="table-light"><tr><th style="width:250px;">Student Feedback / Concern Raised</th><th>Faculty Deliberation & Corrective Action Taken</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>Figma desktop client installations on university lab machines required administrator credentials for plugin updates.</td>
+              <td>Campus IT coordinated immediate mass installation of approved design plugins across Lab E2-310 systems.</td>
+            </tr>
+            <tr>
+              <td>Requested extension on Sprint 2 design submission due to concurrent university cultural symposium.</td>
+              <td>Submission deadline extended by 5 days without penalty; peer review milestone rescheduled accordingly.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 24. FACULTY COURSE REVIEW (DR. SHILPA MAHAJAN) -->
+    <div class="mb-5 page-break">
+      <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">24. Faculty Course Review Report (Dr. Shilpa Mahajan)</h5>
+      <div class="p-4 bg-light rounded border">
+        <div class="d-flex align-items-center gap-3 mb-3 border-bottom pb-3">
+          <div class="brand-icon" style="width: 48px; height: 48px; font-size: 1.4rem;">
+            <i class="bi bi-mortarboard"></i>
+          </div>
+          <div>
+            <h6 class="fw-bold text-dark mb-0">Dr. Shilpa Mahajan</h6>
+            <div class="text-muted small">Associate Professor &bull; Dept of Computer Science & Engineering &bull; Course Coordinator</div>
+          </div>
+        </div>
+        <blockquote class="blockquote small text-secondary mb-3" style="font-size: 0.92rem; line-height: 1.8;">
+          "The Human Computer Interaction (CSE2724) course concluded with outstanding pedagogical success and student engagement. 
+          By unifying rigorous psychological interaction models with intensive laboratory design sprints in Figma, students progressed from 
+          elementary task analyses to delivering fully interactive, accessibility-compliant digital product designs. 
+          Direct attainment exceeded target thresholds across all three accredited outcomes: <strong>CO1 (98.5%)</strong>, 
+          <strong>CO2 (98.5%)</strong>, and <strong>CO3 (95.1%)</strong>, confirming comprehensive student mastery of both theoretical heuristics 
+          and modern user-centered engineering practices. All 391 enrolled students across Sections 1 to 7 participated actively in team project defenses."
+        </blockquote>
+        <div class="d-flex justify-content-between align-items-center pt-2 border-top small text-muted">
+          <span>Signed: <strong>Dr. Shilpa Mahajan</strong> (Course Coordinator)</span>
+          <span>Verified: <strong>Head of Department (CSE)</strong></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 25. ADDITIONAL INFORMATION & PROJECT PORTFOLIO -->
+    <div class="mb-4">
+      <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">25. Additional Information & Complete Course Portfolio</h5>
+      <div class="p-3 bg-light rounded border">
+        <h6 class="fw-bold text-dark small mb-2"><i class="bi bi-folder2-open text-primary me-1"></i> Supporting Accreditations & Repository Dossier</h6>
+        <p class="text-secondary small mb-2">
+          This course file is accompanied by complete digital evidence files archived in the departmental accreditation repository:
+        </p>
+        <ul class="text-secondary small mb-0 ps-3">
+          <li><strong>Interactive Prototypes:</strong> High-fidelity Figma team prototypes and clickable wireframe links for all 391 enrolled students.</li>
+          <li><strong>Usability Evaluation Forms:</strong> Executed Nielsen 10-point heuristic evaluation audit sheets and System Usability Scale (SUS) survey responses.</li>
+          <li><strong>Software Engineering Documentation:</strong> Preserved IEEE 830 Software Requirements Specification (SRS), MoSCoW prioritization catalog, UML Architecture Suite, and automated PyTest verification logs.</li>
+        </ul>
+      </div>
     </div>
 
   </div>
 </div>
-{% endblock %}
-
-{% block scripts %}
-<script src="{{ url_for('static', filename='js/course_file.js') }}"></script>
 {% endblock %}

@@ -1,6 +1,6 @@
 # CourseFlow: University Course File Management System (CFMS)
 ## Complete Technical Understanding, Code Analysis, and Viva Defense Guide
-**Academic Year:** 2024–2025 | **Course:** Software Engineering (CS301) | **Target:** Project Evaluation & Practical Viva
+**Academic Year:** 2026–27 | **Course:** CSE3005 – Software Engineering (3 Credits: 2-0-2) | **Coordinator:** Dr. Shilpa Mahajan | **Institution:** BML Munjal University | **Target:** Software Engineering End-Term Evaluation & Viva
 
 ---
 
@@ -113,15 +113,19 @@ A **Course File** (also called an **Academic Course Handout**) is the official l
 | :--- | :--- | :--- | :--- |
 | **Backend Language** | Python | 3.13.7 | Server execution, business logic, file parsing, and REST APIs. |
 | **Web Framework** | Flask | >=3.0.0 (3.1.3) | HTTP routing, session management, template rendering, and error handling. |
+| **Relational Database** | PostgreSQL / Supabase | PostgreSQL 15+ (Hosted on Supabase) | Persistent relational database storing courses, 25-section course files, marks, attendance, and QA records. |
+| **ORM & Migrations** | Flask-SQLAlchemy, Alembic | SQLAlchemy >=2.0.0, Flask-SQLAlchemy 3.1.1 | Relational object-relational mapping, transactions, and schema migrations. |
+| **Local Fallback** | SQLite | 3.x (`courseflow.db`) | Graceful offline local relational fallback when hosted `DATABASE_URL` is unconfigured. |
 | **Templating Engine** | Jinja2 | >=3.1.0 | Server-side HTML template inheritance and dynamic data injection. |
 | **Frontend Languages** | HTML5, CSS3, JavaScript | ES6+ Modern JavaScript | Responsive UI structure, styling, DOM manipulation, and asynchronous API calls. |
-| **CSS Framework** | Bootstrap 5 | 5.3.2 (via CDN) | Grid system, form controls, modals, badges, and responsive utilities. |
+| **CSS Framework** | Bootstrap 5 | 5.3.3 (via CDN) | Grid system, form controls, modals, badges, and responsive utilities. |
 | **Iconography** | Bootstrap Icons | 1.11.3 (via CDN) | Consistent academic and system icons across all views. |
-| **Data Visualization**| Chart.js | 4.4.1 (via CDN) | Interactive canvas-based bar charts for syllabus progress, attainment comparisons, and PO levels. |
-| **Generative AI SDK** | `google-genai` | >=2.0.0 (2.34.0) | Official Google Gen AI SDK communicating with the `gemini-3.8-flash` model. |
+| **Diagram Engine** | Mermaid.js | 10.x (via CDN) | Dynamic client-side rendering of UML and Data Flow Diagrams. |
+| **Data Visualization**| Chart.js | 4.4.2 (via CDN) | Interactive canvas-based bar charts for syllabus progress, attainment comparisons, and PO levels. |
+| **Generative AI SDK** | `google-genai` | >=2.0.0 (2.34.0) | Official Google Gen AI SDK communicating with the `gemini-2.5-flash` model. |
 | **Document Processing**| `python-docx` | >=1.0.0 (1.2.0) | Reading, extracting text, headings, and table cells from DOCX files. |
 | **PDF Processing** | `pymupdf` (fitz) | >=1.24.0 (1.28.2) | Header validation (`%PDF-`), page checks, and sample PDF generation. |
-| **Environment Mgmt** | `python-dotenv` | >=1.0.0 (1.2.2) | Loading `GEMINI_API_KEY` and `GEMINI_MODEL` securely from local `.env`. |
+| **Environment Mgmt** | `python-dotenv` | >=1.0.0 (1.2.2) | Loading `DATABASE_URL`, `GEMINI_API_KEY`, and `SECRET_KEY` securely from local `.env`. |
 | **Automated Testing** | `pytest` | >=8.0.0 (9.1.1) | Unit tests, route verification, role authorization, and Gemini integration tests. |
 
 ### 2. Architectural Communication Flow
@@ -131,53 +135,94 @@ A **Course File** (also called an **Academic Course Handout**) is the official l
 |                                    BROWSER CLIENT                                     |
 |  - Templates rendered via Jinja2 (HTML5 / Bootstrap 5 / Custom CSS)                  |
 |  - Client Controllers (courses.js, records.js, analytics.js, ai_assistant.js, etc.)  |
-|  - Browser LocalStore Cache ('courseflow_store_v3') for offline instant UI updates    |
+|  - Live Mermaid.js Architecture Diagrams & Chart.js Attainment Visualizations        |
 +------------------------------------------+--------------------------------------------+
                                            | HTTP Requests (GET, POST, PUT, DELETE)
                                            v
 +---------------------------------------------------------------------------------------+
 |                                  FLASK APPLICATION SERVER                             |
-|  - WSGI Dispatcher (app.py)                                                           |
+|  - WSGI Dispatcher (app.py) & Modular Blueprints (routes/)                            |
 |  - Authentication & Decorators (@login_required, @admin_required)                     |
-|  - REST API Layer (/api/courses, /api/syllabus, /api/handouts/summarize, etc.)        |
+|  - Business Services Layer (services/)                                                |
+|  - REST API Layer (/api/courses, /api/syllabus, /api/se/*, /api/attainment, etc.)     |
 +--------------------+-------------------------------------+----------------------------+
                      |                                     |
                      v                                     v
 +-----------------------------------+     +---------------------------------------------+
-|        LOCAL PERSISTENCE          |     |           GOOGLE GEMINI CLOUD API           |
-|  - In-Memory Python Stores        |     |  - Official Google Gen AI SDK (google-genai)|
-|    (DEMO_COURSES, DEMO_USERS,     |     |  - Model: gemini-3.8-flash                  |
-|     DEMO_SYLLABUS)                |     |  - Multimodal PDF & Structured DOCX Input   |
-|  - Server Sample Documents        |     |  - Strict JSON Schema Output Enforcement    |
-|    (static/sample_docs/*.pdf)     |     +---------------------------------------------+
-+-----------------------------------+
+|    POSTGRESQL RELATIONAL DB       |     |           GOOGLE GEMINI CLOUD API           |
+|  - Hosted on Supabase             |     |  - Official Google Gen AI SDK (google-genai)|
+|  - SQLAlchemy 2.0 ORM (models/)   |     |  - Model: gemini-2.5-flash                  |
+|  - 28 Normalized Entities         |     |  - Multimodal PDF & Structured DOCX Input   |
+|  - Local SQLite Fallback          |     |  - Strict JSON Schema Output Enforcement    |
++-----------------------------------+     +---------------------------------------------+
 ```
 
 ### 3. Data Storage & Permanence Tiers
 
-CourseFlow employs a hybrid, multi-tier storage architecture designed for rapid development and high resilience:
+CourseFlow employs a multi-tier storage architecture designed for enterprise integrity and viva demonstrability:
 
 | Storage Tier | Where It Lives | What It Holds | Persistence Behavior |
 | :--- | :--- | :--- | :--- |
-| **1. Browser LocalStorage** | User's browser (`localStorage['courseflow_store_v3']`) | Full active database: Courses, Syllabus, Sessions, Students, Marks, Attendance, Feedback, Outcomes, Attainment, Course Handout Checklist. | **Persistent across page refreshes** and browser restarts on the same machine. Automatically version-managed. |
-| **2. Flask Server Memory** | Python server heap (`app.py` globals: `DEMO_COURSES`, `DEMO_USERS`, `DEMO_SYLLABUS`) | Core course list, demo credentials, active session records, syllabus sync. | **Persists while server is running**. Resets to defaults on server restart. |
-| **3. Flask Secure Sessions** | Cryptographic client cookie signed by `SECRET_KEY` | Current user identity: `email`, `name`, `role` ('faculty' or 'admin'). | **Persists until user logs out** or session cookie expires. |
-| **4. Static File Assets** | Server disk (`static/sample_docs/`) | Standard course handout PDF and DOCX files. | **Permanent disk files** committed to repository. |
+| **1. Hosted PostgreSQL** | Hosted Cloud on **Supabase** | 28 Normalized Entities: Users, Courses, 25-Section Course Files, Syllabus, 48 Sessions, Nominal Roll, Attendance, Marks, Attainment, MoSCoW Requirements, Architecture Diagrams, Test Cases, and SPM Tasks. | **Fully persistent across restarts and multiple client browsers.** ACID transactions with foreign keys. |
+| **2. Local SQLite Fallback** | Local Server Disk (`courseflow.db`) | Complete offline mirror of all 28 tables populated via `seed_data.py`. | **Persistent disk storage** when `DATABASE_URL` is omitted. |
+| **3. Flask Secure Sessions** | Cryptographic client cookie signed by `SECRET_KEY` | Current authenticated user identity: `email`, `name`, `role` ('faculty' or 'admin'). | **Persists until user logs out** or session cookie expires. |
+| **4. Managed File Attachments** | Server Disk (`uploads/`) | Course file evidence attachments (PDF, DOCX, XLSX). Metadata tracked in database. | **Permanent managed storage**. |
 
 ### 4. Project Directory Structure and File Manifest
 
 ```
 CourseFlow/
-├── .env                              # Local private credentials (GIT-IGNORED)
-├── .env.example                      # Template with placeholder credentials
-├── .gitignore                        # Git exclusion rules (ignores .env, pycache, venv)
-├── app.py                            # Flask application server, routes, REST APIs, Gemini processor
+├── .env                              # Local private credentials (DATABASE_URL, GEMINI_API_KEY)
+├── .env.example                      # Template with placeholder credentials for Supabase & Gemini
+├── .gitignore                        # Git exclusion rules (ignores .env, pycache, *.db, uploads/)
+├── config.py                         # Unified configuration module (Dev, Test, Prod)
+├── database.py                       # SQLAlchemy ORM instance & init_db helper
+├── app.py                            # Modular Flask application factory & error handlers
 ├── requirements.txt                  # Python dependencies
-├── COURSEFLOW_COMPLETE_PROJECT_GUIDE.md  # Comprehensive technical markdown viva guide
-├── COURSEFLOW_COMPLETE_PROJECT_GUIDE.pdf # Printable PDF technical viva guide
-├── static/
-│   ├── css/
-│   │   └── style.css                 # Thinkific-inspired ERP design system, clean sidebar, tables
+├── seed_data.py                      # Authoritative database seeder (CSE3005, 25 sections, BMU OBE)
+├── models/                           # 28 Normalized Relational Entities
+│   ├── __init__.py                   # Package export
+│   ├── user.py                       # User, Role
+│   ├── course.py                     # Course, FacultyAssignment, CourseFileSection, CourseDocument
+│   ├── curriculum.py                 # UniversityInfo, SchoolInfo, GA, PEO, PO, PSO, CourseOutcome, CO_PO_Mapping
+│   ├── syllabus.py                   # SyllabusModule, SyllabusUnit, SessionPlan, TimetableEntry
+│   ├── student.py                    # Student, StudentEnrolment, Assessment, StudentMark, AttendanceRecord
+│   ├── feedback.py                   # StudentFeedback, Intervention, COAttainmentRecord
+│   ├── engineering.py                # ProjectRequirement (MoSCoW), ArchitectureDiagram, TestCase, SPM Models
+│   └── audit.py                      # AuditLog
+├── services/                         # Business Logic & Calculation Layer
+│   ├── __init__.py
+│   ├── auth_service.py               # Authentication, password hashing, session state
+│   ├── course_service.py             # 25-Section tracking and completion % calculation
+│   ├── curriculum_service.py         # 7 modules, 48 sessions, exact CO-PO matrix
+│   ├── student_service.py            # Nominal roll, attendance (<75% critical), marks (<40% weak)
+│   ├── attainment_service.py         # Direct (80%) + Indirect (20%) CO attainment calculation
+│   ├── se_service.py                 # MoSCoW filters, diagrams, QA metrics, PERT/CPM calculations
+│   └── ai_service.py                 # Google Gemini 2.5 Flash document summarizer
+├── routes/                           # Modular Blueprint Controllers
+│   ├── __init__.py                   # Blueprint registration
+│   ├── auth_routes.py                # /login, /logout, /api/switch-role
+│   ├── course_routes.py              # /dashboard, /courses, /course-file, /course-file/preview
+│   ├── curriculum_routes.py          # /syllabus, /session-planner, /outcomes, /attainment
+│   ├── student_routes.py             # /students, /assessments, /marks, /attendance, /feedback
+│   ├── engineering_routes.py         # /requirements, /architecture, /testing, /project-management
+│   ├── admin_routes.py               # /admin/faculty, /admin/courses, /admin/assignments, /admin/monitoring
+│   └── api_routes.py                 # REST APIs for JSON endpoints and AI summarizer
+├── templates/                        # Clean Thinkific-Style Templates
+│   ├── base.html                     # Master layout with responsive sidebar and topbar
+│   ├── course_file.html              # 25-Section Course File Checklist & Status Tracker
+│   ├── course_file_preview.html      # Complete 25-Section Printable Course Handout
+│   ├── se_requirements.html          # SRS & MoSCoW Prioritization (Must/Should/Could/Won't Have)
+│   ├── se_architecture.html          # UML & DFD Suite (Use Case, Class, Sequence, DFD, ER, State)
+│   ├── se_testing.html               # Testing Management Module (QA Metrics & Execution Ledger)
+│   ├── se_project_management.html    # SPM Dashboard (Milestones, Kanban, Risks, PERT/CPM)
+│   └── ...                           # All other existing views preserved
+├── static/                           # Static Assets (CSS, JS, Sample Docs)
+└── tests/                            # Automated PyTest Suite (100% Pass Rate across 23 tests)
+    ├── conftest.py
+    ├── test_routes.py                # Page routes, authentication, RBAC, and JSON APIs
+    └── test_se_models_and_services.py# Models, 25 sections, attainment, MoSCoW, QA, SPM
+```
 │   ├── js/
 │   │   ├── admin.js                  # Module 2: Admin faculty and course monitoring controller
 │   │   ├── ai_assistant.js           # Module 7: Gemini AI upload, extraction, and syllabus save

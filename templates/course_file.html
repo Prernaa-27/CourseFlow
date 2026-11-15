@@ -1,83 +1,187 @@
 {% extends "base.html" %}
 
-{% block title %}Course Handout{% endblock %}
-{% block breadcrumb %}Course Handout{% endblock %}
+{% block title %}25-Section Course File Management - CourseFlow{% endblock %}
+{% block breadcrumb %}Course File / 25 Official Sections{% endblock %}
 
 {% block content %}
 <div id="courseFileRoot">
   <!-- Page Header -->
-  <div class="page-header">
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 pb-2 border-bottom">
     <div>
-      <h2 class="page-title">Course Handout Generator</h2>
-      <p class="page-subtitle">Track the 8 essential course-file sections, verify completeness, and generate or preview the course handout.</p>
+      <div class="d-flex align-items-center gap-2 mb-1">
+        <span class="badge bg-primary-subtle text-primary fw-bold px-2 py-1">NBA & NAAC Compliant</span>
+        <span class="badge bg-light text-dark border">BML Munjal University Standard</span>
+      </div>
+      <h3 class="fw-bold text-dark mb-1">Course File Management System (25 Official Sections)</h3>
+      <p class="text-secondary small mb-0">Authoritative Outcome-Based Education (OBE) course file documentation matching the university template.</p>
     </div>
     <div class="d-flex align-items-center gap-2 mt-3 mt-md-0">
-      <a href="/course-file/preview?course_id=CS301" class="btn btn-outline-secondary btn-sm" id="viewPreviewBtn">
-        <i class="bi bi-eye me-1"></i> Preview Course Handout
+      <a href="/course-file/preview?course={{ course.id }}" class="btn btn-outline-secondary btn-sm d-flex align-items-center gap-1" id="viewPreviewBtn">
+        <i class="bi bi-eye"></i> Preview Handout
       </a>
-      <button class="btn btn-primary btn-sm d-flex align-items-center gap-2" id="generateDossierBtn">
-        <i class="bi bi-file-earmark-check"></i> Generate Course Handout
-      </button>
+      <a href="/course-file/preview?course={{ course.id }}" class="btn btn-primary btn-sm d-flex align-items-center gap-1" id="generateDossierBtn">
+        <i class="bi bi-file-earmark-check"></i> Generate Course File
+      </a>
     </div>
   </div>
 
-  <!-- Course Selector & Lifecycle Status Card -->
+  <!-- Course Selector & Overview Metrics Card -->
   <div class="cf-card p-4 mb-4">
     <div class="row g-4 align-items-center">
       <div class="col-md-4">
-        <label for="cfCourseSelect" class="small text-muted fw-semibold mb-1">Select Target Course:</label>
-        <select id="cfCourseSelect" class="form-select form-select-sm">
-          <option value="CS301" selected>CS301 - Software Engineering</option>
-          <option value="CS302">CS302 - Database Management Systems</option>
-          <option value="CS303">CS303 - Design & Analysis of Algorithms</option>
-          <option value="CS401">CS401 - Cloud Computing & DevOps</option>
-          <option value="CS202">CS202 - Object-Oriented Programming (Java)</option>
+        <label for="cfCourseSelect" class="small text-muted fw-semibold mb-1">Active Course File:</label>
+        <select id="cfCourseSelect" class="form-select form-select-sm" onchange="window.location.href='/course-file?course=' + this.value;">
+          <option value="CSE2724" {{ 'selected' if course.code == 'CSE2724' else '' }}>CSE2724 - Human Computer Interaction (Primary)</option>
+          <option value="CSE3005" {{ 'selected' if course.code == 'CSE3005' else '' }}>CSE3005 - Software Engineering (Secondary)</option>
+          <option value="CS301" {{ 'selected' if course.code == 'CS301' else '' }}>CS301 - Software Engineering (Legacy)</option>
+          <option value="CS302" {{ 'selected' if course.code == 'CS302' else '' }}>CS302 - Database Management Systems</option>
+          <option value="CS303" {{ 'selected' if course.code == 'CS303' else '' }}>CS303 - Design & Analysis of Algorithms</option>
+          <option value="CS401" {{ 'selected' if course.code == 'CS401' else '' }}>CS401 - Cloud Computing & DevOps</option>
+          <option value="CS202" {{ 'selected' if course.code == 'CS202' else '' }}>CS202 - Java Programming</option>
         </select>
+        <div class="text-secondary small mt-2" style="font-size:0.75rem;">
+          Coordinator: <strong>{{ course.coordinator_rel.name if course.coordinator_rel else 'Dr. Shilpa Mahajan' }}</strong> &bull; {{ course.department }}
+        </div>
       </div>
 
       <div class="col-md-4 text-center border-start border-end">
-        <div class="text-muted small">Course Handout Status:</div>
-        <div class="mt-1" id="cfStatusBadgeContainer">
-          <span class="badge-status badge-status-inprogress"><i class="bi bi-hourglass-split"></i> In Progress</span>
+        <div class="overview-metric-label">Audit Readiness Status</div>
+        <div class="mt-1">
+          <span class="badge {{ 'bg-success' if metrics.completion >= 80 else 'bg-warning text-dark' }} px-3 py-1 fs-6">
+            <i class="bi {{ 'bi-check-circle-fill' if metrics.completion >= 80 else 'bi-hourglass-split' }} me-1"></i>
+            {{ 'Certified Audit Ready' if metrics.completion >= 80 else 'Compilation In Progress' }}
+          </span>
         </div>
-        <div class="text-secondary small mt-1" style="font-size:0.75rem;">
-          Course Faculty: <strong id="cfFacultyName">Mr. XYZ</strong>
+        <div class="text-muted small mt-1" style="font-size:0.75rem;">
+          {{ metrics.completedSections }} of {{ metrics.totalSections }} sections verified complete
         </div>
       </div>
 
       <div class="col-md-4">
         <div class="d-flex justify-content-between align-items-center mb-1">
-          <span class="small fw-semibold text-muted">Essential Sections Readiness:</span>
-          <span class="fw-bold text-dark fs-5" id="cfCompletionPctLabel">88%</span>
+          <span class="small fw-semibold text-muted">25-Section Completion:</span>
+          <span class="fw-bold text-dark fs-5">{{ metrics.completion }}%</span>
         </div>
-        <div class="cf-progress">
-          <div class="cf-progress-bar cf-progress-bar-indigo" id="cfCompletionProgressBar" style="width: 88%;"></div>
+        <div class="cf-progress" style="height: 8px;">
+          <div class="cf-progress-bar {{ 'cf-progress-bar-success' if metrics.completion >= 80 else 'cf-progress-bar-indigo' }}" style="width: {{ metrics.completion }}%;"></div>
         </div>
-        <div class="text-end mt-2">
-          <button class="btn btn-sm btn-outline-primary py-0 px-2" style="font-size: 0.75rem;" id="markCompleteBtn">
-            <i class="bi bi-check-circle me-1"></i> Mark Handout Complete
-          </button>
+        <div class="d-flex justify-content-between text-muted small mt-2" style="font-size:0.72rem;">
+          <span>Completed: <strong class="text-success">{{ metrics.completedSections }}</strong></span>
+          <span>In Progress: <strong class="text-primary">{{ metrics.inProgressSections }}</strong></span>
+          <span>Needs Review: <strong class="text-warning">{{ metrics.needsReviewSections }}</strong></span>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- 8-Point Checklist Header & List -->
+  <!-- Filter Pills -->
+  <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+    <span class="small fw-semibold text-muted">Filter Sections:</span>
+    <button class="btn btn-sm btn-primary px-3 py-1 section-filter-btn" data-filter="all" style="font-size:0.78rem;">All 25 Sections</button>
+    <button class="btn btn-sm btn-outline-success px-3 py-1 section-filter-btn" data-filter="Completed" style="font-size:0.78rem;">Completed ({{ metrics.completedSections }})</button>
+    <button class="btn btn-sm btn-outline-primary px-3 py-1 section-filter-btn" data-filter="In Progress" style="font-size:0.78rem;">In Progress ({{ metrics.inProgressSections }})</button>
+    <button class="btn btn-sm btn-outline-warning px-3 py-1 section-filter-btn" data-filter="Needs Review" style="font-size:0.78rem;">Needs Review ({{ metrics.needsReviewSections }})</button>
+  </div>
+
+  <!-- 25 Sections List Card -->
   <div class="cf-card mb-4">
-    <div class="cf-card-header">
-      <h6 class="cf-card-title">
-        <i class="bi bi-check2-square text-primary"></i> Essential Course File Sections (8 Core Components)
+    <div class="cf-card-header d-flex justify-content-between align-items-center">
+      <h6 class="cf-card-title mb-0">
+        <i class="bi bi-folder-check text-primary me-2"></i> Official University Course File Structure
       </h6>
-      <span class="small text-muted">Toggle switches reflect section completeness in real time.</span>
+      <span class="small text-muted">BML Munjal University Course File Template Guidelines</span>
     </div>
-    <div class="cf-card-body" id="cfChecklistContainer">
-      <!-- Populated by course_file.js -->
+    <div class="cf-card-body p-0">
+      <div class="cf-table-wrapper">
+        <table class="cf-table">
+          <thead>
+            <tr>
+              <th style="width: 70px;" class="text-center">#</th>
+              <th>Section Name & Scope</th>
+              <th style="width: 170px;">Status</th>
+              <th>Faculty Notes / Evidence</th>
+              <th style="width: 130px;" class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="sectionsTbody">
+            {% for s in sections %}
+            <tr class="section-row" data-status="{{ s.status }}">
+              <td class="text-center fw-bold text-muted">{{ s.section_number }}</td>
+              <td>
+                <div class="fw-semibold text-dark">{{ s.title }}</div>
+                <div class="text-secondary small mt-1" style="font-size:0.78rem; line-height:1.4;">{{ s.description }}</div>
+              </td>
+              <td>
+                <select class="form-select form-select-sm section-status-select" 
+                        data-section-num="{{ s.section_number }}" 
+                        data-course-id="{{ course.id }}"
+                        style="font-size:0.78rem; font-weight:600; width:150px;">
+                  <option value="Completed" {{ 'selected' if s.status == 'Completed' else '' }}>Completed</option>
+                  <option value="In Progress" {{ 'selected' if s.status == 'In Progress' else '' }}>In Progress</option>
+                  <option value="Needs Review" {{ 'selected' if s.status == 'Needs Review' else '' }}>Needs Review</option>
+                  <option value="Not Started" {{ 'selected' if s.status == 'Not Started' else '' }}>Not Started</option>
+                </select>
+              </td>
+              <td>
+                <span class="small text-secondary notes-text" id="notes-{{ s.section_number }}">{{ s.notes or 'Standard template records populated.' }}</span>
+              </td>
+              <td class="text-end">
+                <button class="btn btn-sm btn-outline-secondary py-1 px-2 edit-notes-btn" 
+                        data-section-num="{{ s.section_number }}"
+                        data-section-title="{{ s.title }}"
+                        data-notes="{{ s.notes or '' }}"
+                        data-bs-toggle="modal" 
+                        data-bs-target="#editSectionModal"
+                        style="font-size:0.75rem;">
+                  <i class="bi bi-pencil me-1"></i> Edit
+                </button>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
     </div>
-    <div class="cf-card-footer d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2">
-      <span class="small text-muted"><i class="bi bi-shield-check me-1 text-success"></i>Complete the essential sections to finish your course handout.</span>
-      <div class="d-flex gap-2">
-        <button class="btn btn-sm btn-secondary" onclick="window.location.reload()"><i class="bi bi-arrow-clockwise me-1"></i>Reset Verification</button>
-        <button class="btn btn-sm btn-primary" onclick="document.getElementById('generateDossierBtn').click()"><i class="bi bi-check-lg me-1"></i>Finalize & Generate</button>
+  </div>
+</div>
+
+<!-- Edit Section Notes Modal -->
+<div class="modal fade" id="editSectionModal" tabindex="-1" aria-labelledby="editSectionModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="border-radius: var(--radius-lg);">
+      <div class="modal-header border-bottom">
+        <h6 class="modal-title fw-bold text-dark" id="editSectionModalLabel">Edit Section Evidence & Notes</h6>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body p-4">
+        <input type="hidden" id="modalSectionNumber">
+        <div class="mb-3">
+          <label class="form-label small fw-semibold text-muted">Section Title:</label>
+          <div class="fw-bold text-dark" id="modalSectionTitle"></div>
+        </div>
+        <div class="mb-3">
+          <label for="modalSectionStatus" class="form-label small fw-semibold text-muted">Audit Verification Status:</label>
+          <select class="form-select form-select-sm" id="modalSectionStatus">
+            <option value="Completed">Completed</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Needs Review">Needs Review</option>
+            <option value="Not Started">Not Started</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label for="modalSectionNotes" class="form-label small fw-semibold text-muted">Compliance Notes / Evidence Description:</label>
+          <textarea class="form-control form-control-sm" id="modalSectionNotes" rows="3" placeholder="Enter details regarding question papers, sample solutions, remedial actions, or file attachments..."></textarea>
+        </div>
+        <div class="mb-3">
+          <label for="modalSectionFile" class="form-label small fw-semibold text-muted">Upload Supporting Document / Evidence (PDF, DOCX, ZIP):</label>
+          <input type="file" class="form-control form-control-sm" id="modalSectionFile" accept=".pdf,.docx,.zip,.png,.jpg">
+          <div class="form-text small" style="font-size: 0.72rem;">Evidence documents are archived in the university course audit repository.</div>
+        </div>
+        <div id="modalSectionExistingDocs" class="mb-2"></div>
+      </div>
+      <div class="modal-footer border-top bg-light">
+        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary btn-sm" id="saveSectionNotesBtn">Save Changes</button>
       </div>
     </div>
   </div>
@@ -85,5 +189,140 @@
 {% endblock %}
 
 {% block scripts %}
-<script src="{{ url_for('static', filename='js/course_file.js') }}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  // 1. Status Dropdown Change Handler
+  document.querySelectorAll('.section-status-select').forEach(select => {
+    select.addEventListener('change', async (e) => {
+      const sectionNum = e.target.getAttribute('data-section-num');
+      const courseId = e.target.getAttribute('data-course-id');
+      const newStatus = e.target.value;
+
+      try {
+        const res = await fetch(`/api/course-files/${courseId}/sections/${sectionNum}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: newStatus })
+        });
+        if (res.ok) {
+          CourseFlow.showToast(`Section ${sectionNum} updated to ${newStatus}.`, 'success', 'Section Updated');
+          // Update row data attribute for filtering
+          e.target.closest('tr').setAttribute('data-status', newStatus);
+        } else {
+          CourseFlow.showToast('Failed to update section status.', 'danger', 'Error');
+        }
+      } catch (err) {
+        console.error(err);
+        CourseFlow.showToast('Network error updating status.', 'danger', 'Error');
+      }
+    });
+  });
+
+  // 2. Filter Buttons
+  document.querySelectorAll('.section-filter-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      document.querySelectorAll('.section-filter-btn').forEach(b => {
+        b.classList.remove('btn-primary', 'btn-success', 'btn-warning');
+        b.classList.add('btn-outline-secondary');
+      });
+      e.target.classList.remove('btn-outline-secondary');
+      e.target.classList.add('btn-primary');
+
+      const filter = e.target.getAttribute('data-filter');
+      document.querySelectorAll('.section-row').forEach(row => {
+        if (filter === 'all' || row.getAttribute('data-status') === filter) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+    });
+  });
+
+  // 3. Edit Notes Modal
+  const editModal = document.getElementById('editSectionModal');
+  if (editModal) {
+    editModal.addEventListener('show.bs.modal', async (e) => {
+      const btn = e.relatedTarget;
+      const secNum = btn.getAttribute('data-section-num');
+      const secTitle = btn.getAttribute('data-section-title');
+      const secNotes = btn.getAttribute('data-notes') || '';
+      const courseId = '{{ course.id }}';
+
+      document.getElementById('modalSectionNumber').value = secNum;
+      document.getElementById('modalSectionTitle').textContent = `Section ${secNum}: ${secTitle}`;
+      document.getElementById('modalSectionNotes').value = secNotes;
+      document.getElementById('modalSectionFile').value = '';
+
+      // Set status in modal
+      const statusSelect = document.querySelector(`.section-status-select[data-section-num="${secNum}"]`);
+      if (statusSelect) {
+        document.getElementById('modalSectionStatus').value = statusSelect.value;
+      }
+
+      // Load existing documents
+      const docsContainer = document.getElementById('modalSectionExistingDocs');
+      docsContainer.innerHTML = '<span class="text-muted small">Checking attached documents...</span>';
+      try {
+        const res = await fetch(`/api/course-files/${courseId}/sections/${secNum}/documents`);
+        if (res.ok) {
+          const docs = await res.json();
+          if (docs && docs.length > 0) {
+            docsContainer.innerHTML = `
+              <div class="p-2 border rounded bg-light">
+                <span class="small fw-semibold text-dark d-block mb-1">Attached Evidence Files (${docs.length}):</span>
+                <ul class="list-unstyled mb-0 small">
+                  ${docs.map(d => `<li><i class="bi bi-file-earmark-check text-success me-1"></i>${d.fileName} <span class="text-muted">(${Math.round(d.fileSizeBytes/1024)} KB)</span></li>`).join('')}
+                </ul>
+              </div>
+            `;
+          } else {
+            docsContainer.innerHTML = '<div class="small text-muted"><i class="bi bi-info-circle me-1"></i>No document files uploaded yet. You can attach evidence above.</div>';
+          }
+        }
+      } catch (err) {
+        docsContainer.innerHTML = '';
+      }
+    });
+
+    document.getElementById('saveSectionNotesBtn').addEventListener('click', async () => {
+      const secNum = document.getElementById('modalSectionNumber').value;
+      const notes = document.getElementById('modalSectionNotes').value;
+      const status = document.getElementById('modalSectionStatus').value;
+      const fileInput = document.getElementById('modalSectionFile');
+      const courseId = '{{ course.id }}';
+
+      try {
+        const formData = new FormData();
+        formData.append('notes', notes);
+        formData.append('status', status);
+        if (fileInput.files.length > 0) {
+          formData.append('file', fileInput.files[0]);
+        }
+
+        const res = await fetch(`/api/course-files/${courseId}/sections/${secNum}/upload`, {
+          method: 'POST',
+          body: formData
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          document.getElementById(`notes-${secNum}`).textContent = notes || (data.document ? `Evidence uploaded: ${data.document.fileName}` : 'Standard template records populated.');
+          const statusSelect = document.querySelector(`.section-status-select[data-section-num="${secNum}"]`);
+          if (statusSelect) {
+            statusSelect.value = status;
+            statusSelect.closest('tr').setAttribute('data-status', status);
+          }
+          bootstrap.Modal.getInstance(editModal).hide();
+          CourseFlow.showToast(`Section ${secNum} evidence and notes updated.`, 'success', 'Section Saved');
+        } else {
+          CourseFlow.showToast('Failed to save section evidence.', 'danger', 'Error');
+        }
+      } catch (err) {
+        CourseFlow.showToast('Network error saving section.', 'danger', 'Error');
+      }
+    });
+  }
+});
+</script>
 {% endblock %}

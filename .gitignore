@@ -29,3 +29,9 @@ desktop.ini
 .vscode/
 *.swp
 *.swo
+
+# Local SQLite databases & uploads
+*.db
+*.sqlite
+*.sqlite3
+uploads/

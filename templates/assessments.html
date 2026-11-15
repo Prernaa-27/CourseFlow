@@ -24,15 +24,17 @@
       <div class="col-md-4">
         <label for="assessmentCourseFilter" class="small text-muted fw-semibold mb-1">Course Filter:</label>
         <select id="assessmentCourseFilter" class="form-select form-select-sm">
-          <option value="CS301" selected>CS301 - Software Engineering</option>
-          <option value="CS302">CS302 - Database Management Systems</option>
-          <option value="CS303">CS303 - Design & Analysis of Algorithms</option>
-          <option value="CS401">CS401 - Cloud Computing & DevOps</option>
+          <option value="CSE2724" {{ 'selected' if course.code == 'CSE2724' else '' }}>CSE2724 - Human Computer Interaction (Primary)</option>
+          <option value="CSE3005" {{ 'selected' if course.code == 'CSE3005' else '' }}>CSE3005 - Software Engineering (Secondary)</option>
         </select>
       </div>
       <div class="col-md-8 text-md-end pt-md-3">
         <span class="text-secondary small">
+          {% if course and course.code == 'CSE2724' %}
+          <i class="bi bi-info-circle me-1 text-primary"></i>Lab Assessment (30%) + Course Project (30%) + End-Term Examination (40%) = 100%
+          {% else %}
           <i class="bi bi-info-circle me-1 text-primary"></i>Total internal weightage (50%) + SEE external weightage (50%) = 100%
+          {% endif %}
         </span>
       </div>
     </div>
@@ -95,10 +97,8 @@
             <div class="col-md-4">
               <label for="assessmentCourseField" class="form-label small fw-semibold text-dark">Course</label>
               <select class="form-select form-select-sm" id="assessmentCourseField">
-                <option value="CS301">CS301</option>
-                <option value="CS302">CS302</option>
-                <option value="CS303">CS303</option>
-                <option value="CS401">CS401</option>
+                <option value="CSE2724">CSE2724</option>
+                <option value="CSE3005">CSE3005</option>
               </select>
             </div>
 
